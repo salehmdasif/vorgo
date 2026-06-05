@@ -8,7 +8,7 @@ from app.core.exceptions import AppError, ErrorResponse
 from app.core.middleware import RequestIDMiddleware, SecurityHeadersMiddleware
 from app.core.database import check_db_connection, engine
 from app.core.redis import check_redis_connection, close_redis_pool
-from app.api.v1.system import router as system_router
+from app.api.v1 import api_router
 
 
 @asynccontextmanager
@@ -101,5 +101,4 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 
 
 # ── Routers ───────────────────────────────────────────────────────────────────
-app.include_router(system_router, prefix="/api/v1")
-# commit 4 থেকে auth, users, orgs, billing routers যোগ হবে
+app.include_router(api_router, prefix="/api/v1")
