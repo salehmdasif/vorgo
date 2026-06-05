@@ -3,11 +3,8 @@ from typing import Optional
 
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
-from fastapi_users.authentication import (
-    AuthenticationBackend,
-    BearerTransport,
-    JWTStrategy,
-)
+from fastapi_users.authentication import AuthenticationBackend, BearerTransport
+from app.core.security.jwt import ED25519JWTStrategy
 from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -54,12 +51,8 @@ async def get_user_manager(user_db=Depends(get_user_db)):
 bearer_transport = BearerTransport(tokenUrl="/api/v1/auth/login")
 
 
-def get_jwt_strategy() -> JWTStrategy:
-    # Commit 5 এ এই function এর body বদলাবে
-    return JWTStrategy(
-        secret=settings.SECRET_KEY,
-        lifetime_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-    )
+def get_jwt_strategy() -> ED25519JWTStrategy:
+    return ED25519JWTStrategy()
 
 
 auth_backend = AuthenticationBackend(
