@@ -1,13 +1,14 @@
 """
-ED25519 key pair generate করে .env এ লিখে দেয়।
-HS256 না নিয়ে ED25519 নেওয়ার কারণ:
-  - asymmetric - private key দিয়ে sign, public key দিয়ে verify
-  - public key share করা যায় (microservice), private key server এ থাকে
-  - HS256 এ যে secret জানে সে token বানাতেও পারে - এখানে পারবে না
+Generates an ED25519 key pair and writes it to .env.
+
+ED25519 over HS256:
+  - asymmetric: sign with private key, verify with public key
+  - public key can be shared with microservices; private key stays on the server
+  - anyone with an HS256 secret can forge tokens — not possible with ED25519
 
 Usage:
     python -m app.scripts.generate_keys
-    অথবা: make generate-keys
+    or: make generate-keys
 """
 
 import base64
@@ -21,8 +22,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 def generate_ed25519_keypair() -> tuple[str, str]:
     private_key = Ed25519PrivateKey.generate()
 
-    # Raw format নেওয়া হয়েছে - PEM এর চেয়ে compact, .env এ রাখা সহজ
-    # base64 encode করে string হিসেবে রাখা হচ্ছে
+    # Raw format is more compact than PEM and easier to store in .env
     private_bytes = private_key.private_bytes(
         encoding=serialization.Encoding.Raw,
         format=serialization.PrivateFormat.Raw,
@@ -48,7 +48,6 @@ def update_env_file(private_key: str, public_key: str) -> None:
     content = env_path.read_text()
 
     def set_key(content: str, key: str, value: str) -> str:
-        # key আগে থেকে থাকলে replace করো, না থাকলে append করো
         pattern = rf"^{key}=.*$"
         replacement = f"{key}={value}"
         if re.search(pattern, content, re.MULTILINE):
@@ -65,5 +64,4 @@ if __name__ == "__main__":
     private_key, public_key = generate_ed25519_keypair()
     update_env_file(private_key, public_key)
     print("Keys generated and saved to .env")
-    # public key print করা safe - এটা share করা যায়
     print(f"Public Key: {public_key}")

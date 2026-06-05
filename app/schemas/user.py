@@ -8,11 +8,8 @@ from app.models.user import UserRole
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
     """
-    API response এ যে User data client পাবে।
-
-    BaseUser থেকে আসে: id, email, is_active, is_verified, is_superuser
-    hashed_password কখনো expose হয় না - BaseUser এ নেই।
-    totp_secret কখনো expose হয় না - intentionally বাদ।
+    User data returned in API responses.
+    hashed_password and totp_secret are never exposed.
     """
 
     org_id: uuid.UUID | None = None
@@ -23,18 +20,12 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
 
 
 class UserCreate(schemas.BaseUserCreate):
-    """
-    Registration এ client থেকে নেওয়া হবে: email + password।
-    fastapi-users password strength validation করে।
-    """
+    """Registration payload: email + password."""
 
     pass
 
 
 class UserUpdate(schemas.BaseUserUpdate):
-    """
-    Profile update - password optional।
-    current_password দিতে হবে password change করতে (fastapi-users enforce করে)।
-    """
+    """Profile update — password is optional."""
 
     pass

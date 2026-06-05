@@ -19,27 +19,19 @@ class UserRole(str, enum.Enum):
 
 class User(SQLAlchemyBaseUserTableUUID, TimestampMixin, Base):
     """
-    fastapi-users compatible User model।
+    fastapi-users compatible User model.
 
-    SQLAlchemyBaseUserTableUUID থেকে পাওয়া fields:
-        id (UUID, primary key)
-        email (str, unique)
-        hashed_password (str)
-        is_active (bool)
-        is_verified (bool)
-        is_superuser (bool)  - super_admin এর জন্য True
+    Inherited from SQLAlchemyBaseUserTableUUID:
+        id, email, hashed_password, is_active, is_verified, is_superuser
 
-    আমাদের extra fields নিচে।
-
-    Note: BaseModel extend করা যাবে না - id conflict হবে।
-    TimestampMixin + Base আলাদা করে extend করা হচ্ছে।
+    Do not extend BaseModel — id conflict.
+    TimestampMixin and Base are extended separately.
     """
 
     __tablename__ = "users"
 
-    # org_id nullable - super_admin এর কোনো org নেই
-    # normal user এর জন্য always set থাকবে
-    # Organization delete হলে SET NULL - user account maintain থাকবে
+    # nullable — super_admin has no org, regular users always have one
+    # SET NULL on org delete to preserve user accounts
     org_id: Mapped[UUID | None] = mapped_column(
         PG_UUID(as_uuid=True),
         ForeignKey("organizations.id", ondelete="SET NULL"),
@@ -53,9 +45,7 @@ class User(SQLAlchemyBaseUserTableUUID, TimestampMixin, Base):
         nullable=False,
     )
 
-    # ── 2FA ───────────────────────────────────────────────────────────────────
-    # totp_secret - AES-256 encrypted করে store করো (app/core/security/two_factor.py)
-    # plaintext store করা risky - DB leak হলে সব user এর 2FA compromise হবে
+    # totp_secret must be AES-256 encrypted before storing (app/core/security/two_factor.py)
     totp_secret: Mapped[str | None] = mapped_column(
         String(255),
         nullable=True,
@@ -66,8 +56,7 @@ class User(SQLAlchemyBaseUserTableUUID, TimestampMixin, Base):
         nullable=False,
     )
 
-    # backup_codes - 8টা, bcrypt hashed, one-time use
-    # use হলে সেই code array থেকে delete করো
+    # 8 bcrypt-hashed one-time backup codes — delete each after use
     backup_codes: Mapped[list] = mapped_column(
         ARRAY(String),
         default=list,

@@ -15,9 +15,6 @@ from app.core.redis import check_redis_connection, close_redis_pool
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # ── Startup ───────────────────────────────────────────────────────────
-    # DB বা Redis fail করলে app চলতে দেওয়া ঠিক না
-    # misconfigured state এ request নেওয়া শুরু করলে silent error হবে
     db_ok = await check_db_connection()
     if not db_ok:
         raise RuntimeError("Database connection failed on startup.")
@@ -29,8 +26,6 @@ async def lifespan(app: FastAPI):
     print(f"Vorgo started [{settings.ENVIRONMENT}]")
     yield
 
-    # ── Shutdown ──────────────────────────────────────────────────────────
-    # graceful shutdown - in-flight request শেষ হওয়ার পর connection close হবে
     await engine.dispose()
     await close_redis_pool()
     print("Vorgo shutdown complete.")
@@ -40,15 +35,13 @@ app = FastAPI(
     title=settings.APP_NAME,
     version="0.1.0",
     description="Production-ready FastAPI SaaS Boilerplate. Python-only. No React required.",
-    # production এ docs বন্ধ রাখো - API structure expose করা ঠিক না
     docs_url="/docs" if settings.DEBUG else None,
     redoc_url="/redoc" if settings.DEBUG else None,
     lifespan=lifespan,
 )
 
-# ── Middleware ────────────────────────────────────────────────────────────────
-# IMPORTANT: order matters - stack এর মতো কাজ করে, last added = outermost
-# RequestID আগে add হওয়া দরকার যাতে সব handler এ request_id পাওয়া যায়
+# Middleware order matters — last added is outermost.
+# RequestIDMiddleware must be inner so request_id is available in all handlers.
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RequestIDMiddleware)
 app.add_middleware(
@@ -59,8 +52,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Sentry ────────────────────────────────────────────────────────────────────
-# SENTRY_DSN .env এ না থাকলে initialize হবে না - dev এ noise নেই
 if settings.SENTRY_DSN:
     import sentry_sdk
 
@@ -70,11 +61,8 @@ if settings.SENTRY_DSN:
     )
 
 
-# ── Exception Handlers ────────────────────────────────────────────────────────
 @app.exception_handler(AppError)
 async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
-    # সব business logic error এখানে আসে
-    # request_id না পেলে "unknown" - middleware miss করলে fallback
     request_id = getattr(request.state, "request_id", "unknown")
     return JSONResponse(
         status_code=exc.status_code,
@@ -91,7 +79,6 @@ async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
 async def validation_error_handler(
     request: Request, exc: RequestValidationError
 ) -> JSONResponse:
-    # Pydantic 422 errors - reformat to our ErrorResponse shape
     request_id = getattr(request.state, "request_id", "unknown")
     details = {}
     for error in exc.errors():
@@ -110,7 +97,6 @@ async def validation_error_handler(
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
-    # fastapi-users raises HTTPException for auth failures - reformat to our shape
     request_id = getattr(request.state, "request_id", "unknown")
     error_map = {
         400: "BAD_REQUEST",
@@ -134,7 +120,6 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    # catch-all - unexpected error stays off the client
     request_id = getattr(request.state, "request_id", "unknown")
     return JSONResponse(
         status_code=500,
@@ -147,5 +132,4 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
     )
 
 
-# ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(api_router, prefix="/api/v1")

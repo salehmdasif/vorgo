@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db
-from app.core.exceptions import Errors
+from app.core.exceptions import AppError, Errors
 from app.core.redis import get_redis_pool
 from app.core.security.jwt import ED25519JWTStrategy
 from app.models.user import User
@@ -42,39 +42,31 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
                 await redis.delete(lockout_key)
             return user
         except Exception as exc:
-            # re-raise AppError (lockout), let others pass through
-            from app.core.exceptions import AppError
-
             if isinstance(exc, AppError):
                 raise
             return await super().authenticate(credentials)
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
-        # TODO: Commit 14 - welcome email
-        # TODO: default Organization create, user.org_id set
+        # TODO: send welcome email (Commit 14)
+        # TODO: create default Organization and set user.org_id
         pass
 
     async def on_after_forgot_password(
         self, user: User, token: str, request: Optional[Request] = None
     ):
-        # TODO: Commit 6 - password reset link সহ email পাঠাও
+        # TODO: send password reset email (Commit 14)
         pass
 
     async def on_after_request_verify(
         self, user: User, token: str, request: Optional[Request] = None
     ):
-        # TODO: Commit 6 - email verification link সহ email পাঠাও
+        # TODO: send email verification link (Commit 14)
         pass
 
 
 async def get_user_manager(user_db=Depends(get_user_db)):
     yield UserManager(user_db)
 
-
-# ── Auth Backend ──────────────────────────────────────────────────────────────
-# Commit 4: temporary HS256 JWT - functional কিন্তু production-ready না
-# Commit 5: get_jwt_strategy() এ ED25519JWTStrategy দিয়ে replace হবে
-# transport আর backend এর বাকি সব same থাকবে - শুধু strategy বদলাবে
 
 bearer_transport = BearerTransport(tokenUrl="/api/v1/auth/login")
 
@@ -89,15 +81,11 @@ auth_backend = AuthenticationBackend(
     get_strategy=get_jwt_strategy,
 )
 
-# ── FastAPIUsers instance ─────────────────────────────────────────────────────
 fastapi_users = FastAPIUsers[User, uuid.UUID](
     get_user_manager,
     [auth_backend],
 )
 
-# ── Current user dependencies ─────────────────────────────────────────────────
-# route এ Depends() দিয়ে use করো
-# from app.core.auth import current_active_user
 current_active_user = fastapi_users.current_user(active=True)
 current_verified_user = fastapi_users.current_user(active=True, verified=True)
 current_superuser = fastapi_users.current_user(active=True, superuser=True)

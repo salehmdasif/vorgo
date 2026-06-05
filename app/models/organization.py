@@ -28,8 +28,7 @@ class Organization(BaseModel):
 
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    # slug - subdomain routing এ use হয়: company.yoursaas.com
-    # unique + index: প্রতিটা request এ subdomain lookup হবে, fast হওয়া দরকার
+    # slug is used for subdomain routing: company.yoursaas.com
     slug: Mapped[str] = mapped_column(
         String(100),
         unique=True,
@@ -49,17 +48,17 @@ class Organization(BaseModel):
         nullable=False,
     )
 
-    # trial_ends_at - None মানে trial নেই (active subscription বা free plan)
+    # None means no active trial (free plan or active subscription)
     trial_ends_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
         nullable=True,
     )
 
-    # Stripe IDs - billing এ দরকার, None মানে এখনো Stripe এ register হয়নি
+    # None means not yet registered with Stripe
     stripe_customer_id: Mapped[str | None] = mapped_column(
         String(255),
         nullable=True,
-        unique=True,  # একটা org এর একটাই Stripe customer থাকবে
+        unique=True,
     )
     stripe_subscription_id: Mapped[str | None] = mapped_column(
         String(255),
@@ -67,8 +66,7 @@ class Organization(BaseModel):
         unique=True,
     )
 
-    # per-org settings: timezone, locale, branding, feature toggles
-    # JSONB - structure fix না করেই যেকোনো config store করা যায়
+    # flexible per-org config: timezone, locale, branding, feature toggles
     settings: Mapped[dict] = mapped_column(
         JSONB,
         default=dict,

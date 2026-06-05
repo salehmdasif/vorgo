@@ -4,15 +4,13 @@ import redis.asyncio as aioredis
 
 from app.core.config import settings
 
-# module-level pool - app lifetime এ একটাই instance থাকবে
-# প্রতি request এ নতুন connection না নিয়ে pool থেকে নেওয়া হয়
 _redis_pool: aioredis.Redis | None = None
 
 
 async def get_redis_pool() -> aioredis.Redis:
+    """Returns the module-level Redis pool, creating it on first call."""
     global _redis_pool
     if _redis_pool is None:
-        # decode_responses=True - bytes এর বদলে str পাওয়া যাবে
         _redis_pool = aioredis.from_url(
             settings.REDIS_URL,
             encoding="utf-8",
@@ -22,16 +20,13 @@ async def get_redis_pool() -> aioredis.Redis:
 
 
 async def get_redis() -> AsyncGenerator[aioredis.Redis, None]:
-    # FastAPI Depends() এ use করো
-    # NOTE: Redis connection pool এ close করার দরকার নেই - pool manage করে
+    """FastAPI dependency — yields the shared Redis pool."""
     pool = await get_redis_pool()
     yield pool
 
 
 async def check_redis_connection() -> bool:
-    # startup health check আর /health endpoint দুটোতেই use হয়
-    # Redis down থাকলে rate limiting আর token revocation silently skip হবে
-    # app crash করবে না - degraded mode এ চলবে
+    """Returns False if Redis is unreachable. App continues in degraded mode."""
     try:
         pool = await get_redis_pool()
         await pool.ping()
@@ -41,7 +36,7 @@ async def check_redis_connection() -> bool:
 
 
 async def close_redis_pool() -> None:
-    # app shutdown এ engine.dispose() এর পরে call করো
+    """Called on app shutdown after engine.dispose()."""
     global _redis_pool
     if _redis_pool:
         await _redis_pool.aclose()

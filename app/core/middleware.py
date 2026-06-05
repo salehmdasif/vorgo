@@ -6,30 +6,18 @@ from starlette.responses import Response
 
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
-    """
-    প্রতিটা request এ unique ID inject করে।
-    error log এ request_id দিয়ে Sentry বা structlog এ trace করা যায়।
-    response header এও পাঠায় - frontend থেকে support ticket এ দেওয়া যাবে।
-    """
+    """Injects a unique UUID into every request for tracing in logs and Sentry."""
 
     async def dispatch(self, request: Request, call_next) -> Response:
         request_id = str(uuid4())
-        request.state.request_id = request_id  # error handler এ access করবে
+        request.state.request_id = request_id
         response = await call_next(request)
         response.headers["X-Request-ID"] = request_id
         return response
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    """
-    Browser-level attack vector গুলো বন্ধ করে।
-
-    X-Content-Type-Options  → MIME sniffing বন্ধ
-    X-Frame-Options         → clickjacking বন্ধ (iframe embed করা যাবে না)
-    X-XSS-Protection        → legacy XSS filter (modern browser এ built-in)
-    Referrer-Policy         → cross-origin request এ referer header limit করে
-    Permissions-Policy      → camera, mic, location access বন্ধ
-    """
+    """Sets security headers on every response."""
 
     async def dispatch(self, request: Request, call_next) -> Response:
         response = await call_next(request)
