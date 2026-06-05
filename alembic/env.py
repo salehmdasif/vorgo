@@ -6,12 +6,22 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 from app.core.config import settings
-from app.models.base import Base
+from app.models.base import Base  # noqa: F401
 
-# নতুন model তৈরি করলে এখানে import করতে হবে
-# না করলে autogenerate migration এ নতুন table detect হবে না
-# from app.models.user import User
-# from app.models.organization import Organization
+# ── Model imports ──────────────────────────────────────────────────────────────
+# নতুন model তৈরি করলে নিচে import করো।
+# না করলে `make migration` এ autogenerate নতুন table detect করবে না।
+# import order matter করে না — alembic dependency graph নিজে resolve করে।
+#
+# Commit 3+:
+# from app.models.organization import Organization  # noqa: F401
+# from app.models.user import User                  # noqa: F401
+# from app.models.invitation import Invitation      # noqa: F401
+# from app.models.api_key import APIKey             # noqa: F401
+# from app.models.audit_log import AuditLog         # noqa: F401
+# from app.models.feature_flag import FeatureFlag   # noqa: F401
+# from app.models.ai_usage import AIUsage           # noqa: F401
+# from app.models.webhook import WebhookEndpoint, WebhookDelivery  # noqa: F401
 
 config = context.config
 

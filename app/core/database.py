@@ -1,4 +1,5 @@
 from typing import AsyncGenerator
+from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
     AsyncSession,
@@ -31,6 +32,30 @@ AsyncSessionLocal = async_sessionmaker(
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     # FastAPI Depends() এ use করো — request শেষে automatically close হবে
     # success হলে commit, exception হলে rollback — caller কে ভাবতে হবে না
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+
+
+@asynccontextmanager
+async def get_db_context() -> AsyncGenerator[AsyncSession, None]:
+    """
+    arq background task, seeder script, বা CLI command এ use করো।
+    FastAPI request scope এর বাইরে DB session দরকার হলে এটা।
+
+    Usage (arq task):
+        async def my_task(ctx):
+            async with get_db_context() as db:
+                result = await db.execute(select(User))
+
+    get_db() এর সাথে পার্থক্য:
+    - get_db() → FastAPI Depends() এ, request lifecycle এ bound
+    - get_db_context() → যেকোনো async context এ, manually manage করা
+    """
     async with AsyncSessionLocal() as session:
         try:
             yield session

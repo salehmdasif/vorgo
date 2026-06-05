@@ -1,8 +1,8 @@
-from uuid import uuid4
+from uuid import UUID, uuid4
 from datetime import datetime, UTC
-from sqlalchemy import DateTime
+from sqlalchemy import DateTime, ForeignKey
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
 
 class Base(DeclarativeBase):
@@ -41,7 +41,32 @@ class BaseModel(TimestampMixin, Base):
     __abstract__ = True  # এই class এর নিজস্ব table হবে না
 
     id: Mapped[UUID] = mapped_column(
-        UUID(as_uuid=True),
+        PG_UUID(as_uuid=True),
         primary_key=True,
         default=uuid4,
+    )
+
+
+class TenantMixin:
+    """
+    Multi-tenancy এর core building block।
+    এই mixin যে model এ থাকবে, সেই table এ org_id column থাকবে।
+
+    Usage:
+        class Product(TenantMixin, BaseModel):
+            __tablename__ = "products"
+            ...
+
+    Rules:
+    - সব tenant-scoped model এ এই mixin use করো
+    - TenantService সব query তে org_id filter automatically add করে
+    - Direct query করলে org_id filter ভুলে যাওয়ার risk আছে — TenantService use করো
+    - organizations table আগে তৈরি হওয়া দরকার (Commit 3 এ হবে)
+    """
+
+    org_id: Mapped[UUID] = mapped_column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,  # প্রতিটা query তে org_id filter থাকবে — index ছাড়া full scan হবে
     )
