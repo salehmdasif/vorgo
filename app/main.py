@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 
 from app.core.config import settings
 from app.core.exceptions import AppError, ErrorResponse
@@ -84,10 +85,52 @@ async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
     )
 
 
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    # Pydantic 422 errors — reformat to our ErrorResponse shape
+    request_id = getattr(request.state, "request_id", "unknown")
+    details = {}
+    for error in exc.errors():
+        field = ".".join(str(loc) for loc in error["loc"] if loc != "body")
+        details[field] = error["msg"]
+    return JSONResponse(
+        status_code=422,
+        content=ErrorResponse(
+            error="VALIDATION_ERROR",
+            message="Input validation failed.",
+            details=details,
+            request_id=request_id,
+        ).model_dump(),
+    )
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    # fastapi-users raises HTTPException for auth failures — reformat to our shape
+    request_id = getattr(request.state, "request_id", "unknown")
+    error_map = {
+        400: "BAD_REQUEST",
+        401: "UNAUTHORIZED",
+        403: "FORBIDDEN",
+        404: "NOT_FOUND",
+        405: "METHOD_NOT_ALLOWED",
+        409: "CONFLICT",
+        429: "RATE_LIMITED",
+    }
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(
+            error=error_map.get(exc.status_code, "HTTP_ERROR"),
+            message=str(exc.detail),
+            details={},
+            request_id=request_id,
+        ).model_dump(),
+    )
+
+
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    # catch-all — unexpected error যেন raw traceback client এ না যায়
-    # Sentry এ automatically capture হবে যদি configured থাকে
+    # catch-all — unexpected error stays off the client
     request_id = getattr(request.state, "request_id", "unknown")
     return JSONResponse(
         status_code=500,

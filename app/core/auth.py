@@ -10,7 +10,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_db
+from app.core.exceptions import Errors
+from app.core.redis import get_redis_pool
 from app.models.user import User
+
+_LOCKOUT_MAX_ATTEMPTS = 5
+_LOCKOUT_TTL_SECONDS = 15 * 60  # 15 minutes
 
 
 async def get_user_db(session: AsyncSession = Depends(get_db)):
@@ -21,9 +26,31 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     reset_password_token_secret = settings.SECRET_KEY
     verification_token_secret = settings.SECRET_KEY
 
+    async def authenticate(self, credentials):
+        email = credentials.username.lower()
+        lockout_key = f"lockout:{email}"
+        try:
+            redis = await get_redis_pool()
+            attempts = await redis.get(lockout_key)
+            if attempts and int(attempts) >= _LOCKOUT_MAX_ATTEMPTS:
+                raise Errors.ACCOUNT_LOCKED()
+            user = await super().authenticate(credentials)
+            if user is None:
+                await redis.incr(lockout_key)
+                await redis.expire(lockout_key, _LOCKOUT_TTL_SECONDS)
+            else:
+                await redis.delete(lockout_key)
+            return user
+        except Exception as exc:
+            # re-raise AppError (lockout), let others pass through
+            from app.core.exceptions import AppError
+            if isinstance(exc, AppError):
+                raise
+            return await super().authenticate(credentials)
+
     async def on_after_register(self, user: User, request: Optional[Request] = None):
-        # TODO: Commit 6 — welcome email পাঠাও
-        # TODO: default Organization তৈরি করো, user.org_id set করো
+        # TODO: Commit 14 — welcome email
+        # TODO: default Organization create, user.org_id set
         pass
 
     async def on_after_forgot_password(

@@ -75,6 +75,16 @@ class Errors:
         status_code=422,
         details=details or {},
     )
+    ACCOUNT_LOCKED = lambda: AppError(
+        code="ACCOUNT_LOCKED",
+        message="Too many failed attempts. Try again in 15 minutes.",
+        status_code=429,
+    )
+    RATE_LIMITED = lambda: AppError(
+        code="RATE_LIMITED",
+        message="Too many requests. Slow down.",
+        status_code=429,
+    )
     INTERNAL_ERROR = lambda: AppError(
         code="INTERNAL_ERROR",
         message="An unexpected error occurred.",
