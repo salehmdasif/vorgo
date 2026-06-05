@@ -1,4 +1,5 @@
 from collections.abc import Callable
+
 from fastapi import Depends
 
 from app.core.auth import current_active_user
@@ -16,28 +17,34 @@ def require_role(*roles: UserRole) -> Callable:
         async def stats(user: User = Depends(require_role(UserRole.ADMIN))):
             ...
     """
+
     async def dependency(user: User = Depends(current_active_user)) -> User:
         if user.is_superuser:
             return user
         if user.role not in roles:
             raise Errors.FORBIDDEN()
         return user
+
     return dependency
 
 
 def require_superuser() -> Callable:
     """Only super_admin (is_superuser=True) can access."""
+
     async def dependency(user: User = Depends(current_active_user)) -> User:
         if not user.is_superuser:
             raise Errors.FORBIDDEN()
         return user
+
     return dependency
 
 
 def require_verified() -> Callable:
     """User must have verified their email."""
+
     async def dependency(user: User = Depends(current_active_user)) -> User:
         if not user.is_verified:
             raise Errors.FORBIDDEN()
         return user
+
     return dependency

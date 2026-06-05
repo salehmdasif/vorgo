@@ -1,13 +1,14 @@
-from typing import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import AsyncGenerator
+
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
-    create_async_engine,
     AsyncSession,
     async_sessionmaker,
+    create_async_engine,
 )
-from sqlalchemy import text
-from app.core.config import settings
 
+from app.core.config import settings
 
 # pool_pre_ping=True - stale connection কে automatically drop করে নতুন নেয়
 # pool_size=20, max_overflow=10 - total max 30 concurrent connections

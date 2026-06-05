@@ -1,4 +1,5 @@
 import json
+
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -12,7 +13,9 @@ class Settings(BaseSettings):
 
     # ── Database ──────────────────────────────────────────────────────────
     # asyncpg driver required - sync psycopg2 এ async কাজ করবে না
-    DATABASE_URL: str = "postgresql+asyncpg://vorgo_user:vorgo_pass@localhost:5432/vorgo_db"
+    DATABASE_URL: str = (
+        "postgresql+asyncpg://vorgo_user:vorgo_pass@localhost:5432/vorgo_db"
+    )
 
     # ── Redis ─────────────────────────────────────────────────────────────
     # refresh token, rate limiting, session revocation সব এখানে
@@ -23,7 +26,7 @@ class Settings(BaseSettings):
     # `make generate-keys` চালালে .env এ automatically লিখে দেবে
     ED25519_PRIVATE_KEY: str = ""
     ED25519_PUBLIC_KEY: str = ""
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15   # short - refresh token দিয়ে renew হবে
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15  # short - refresh token দিয়ে renew হবে
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
     # ── Email ─────────────────────────────────────────────────────────────

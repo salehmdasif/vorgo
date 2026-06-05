@@ -1,15 +1,16 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, HTTPException
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
 
+from app.api.v1 import api_router
 from app.core.config import settings
+from app.core.database import check_db_connection, engine
 from app.core.exceptions import AppError, ErrorResponse
 from app.core.middleware import RequestIDMiddleware, SecurityHeadersMiddleware
-from app.core.database import check_db_connection, engine
 from app.core.redis import check_redis_connection, close_redis_pool
-from app.api.v1 import api_router
 
 
 @asynccontextmanager
@@ -62,6 +63,7 @@ app.add_middleware(
 # SENTRY_DSN .env এ না থাকলে initialize হবে না - dev এ noise নেই
 if settings.SENTRY_DSN:
     import sentry_sdk
+
     sentry_sdk.init(
         dsn=settings.SENTRY_DSN,
         environment=settings.ENVIRONMENT,
@@ -86,7 +88,9 @@ async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_error_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+async def validation_error_handler(
+    request: Request, exc: RequestValidationError
+) -> JSONResponse:
     # Pydantic 422 errors - reformat to our ErrorResponse shape
     request_id = getattr(request.state, "request_id", "unknown")
     details = {}

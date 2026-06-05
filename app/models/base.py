@@ -1,8 +1,9 @@
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
-from datetime import datetime, UTC
+
 from sqlalchemy import DateTime, ForeignKey
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):

@@ -1,6 +1,7 @@
 import uuid
-from pydantic import ConfigDict
+
 from fastapi_users import schemas
+from pydantic import ConfigDict
 
 from app.models.user import UserRole
 

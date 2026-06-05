@@ -1,6 +1,8 @@
 from uuid import UUID
-from sqlalchemy import String, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB
+
+from sqlalchemy import ForeignKey, String
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import BaseModel, TenantMixin
@@ -42,7 +44,9 @@ class AuditLog(TenantMixin, BaseModel):
     resource_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     # request context
-    ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)  # IPv6 max 45 chars
+    ip_address: Mapped[str | None] = mapped_column(
+        String(45), nullable=True
+    )  # IPv6 max 45 chars
     user_agent: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     # extra data - before/after values, reason, etc.

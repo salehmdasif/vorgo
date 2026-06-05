@@ -1,6 +1,6 @@
 import base64
 import uuid
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import jwt
@@ -12,28 +12,25 @@ from fastapi_users.authentication import JWTStrategy
 
 from app.core.config import settings
 
-
 # ── Key loaders ───────────────────────────────────────────────────────────────
+
 
 def load_private_key() -> Ed25519PrivateKey:
     if not settings.ED25519_PRIVATE_KEY:
-        raise ValueError(
-            "ED25519_PRIVATE_KEY is not set. Run `make generate-keys`."
-        )
+        raise ValueError("ED25519_PRIVATE_KEY is not set. Run `make generate-keys`.")
     raw = base64.b64decode(settings.ED25519_PRIVATE_KEY)
     return Ed25519PrivateKey.from_private_bytes(raw)
 
 
 def load_public_key() -> Ed25519PublicKey:
     if not settings.ED25519_PUBLIC_KEY:
-        raise ValueError(
-            "ED25519_PUBLIC_KEY is not set. Run `make generate-keys`."
-        )
+        raise ValueError("ED25519_PUBLIC_KEY is not set. Run `make generate-keys`.")
     raw = base64.b64decode(settings.ED25519_PUBLIC_KEY)
     return Ed25519PublicKey.from_public_bytes(raw)
 
 
 # ── Token creators ────────────────────────────────────────────────────────────
+
 
 def create_access_token(user_id: str) -> str:
     private_key = load_private_key()
@@ -42,9 +39,8 @@ def create_access_token(user_id: str) -> str:
         "type": "access",
         "jti": str(uuid.uuid4()),
         "iat": datetime.now(UTC),
-        "exp": datetime.now(UTC) + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-        ),
+        "exp": datetime.now(UTC)
+        + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     }
     return jwt.encode(payload, private_key, algorithm="EdDSA")
 
@@ -58,9 +54,7 @@ def create_refresh_token(user_id: str) -> tuple[str, str]:
         "type": "refresh",
         "jti": jti,
         "iat": datetime.now(UTC),
-        "exp": datetime.now(UTC) + timedelta(
-            days=settings.REFRESH_TOKEN_EXPIRE_DAYS
-        ),
+        "exp": datetime.now(UTC) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
     }
     token = jwt.encode(payload, private_key, algorithm="EdDSA")
     return token, jti
@@ -73,6 +67,7 @@ def verify_token(token: str) -> dict[str, Any]:
 
 
 # ── fastapi-users strategy ────────────────────────────────────────────────────
+
 
 class ED25519JWTStrategy(JWTStrategy):
     """

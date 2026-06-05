@@ -1,4 +1,5 @@
 from arq.connections import RedisSettings
+
 from app.core.config import settings
 
 # arq use করা হয়েছে Celery এর বদলে কারণ:
@@ -29,5 +30,5 @@ class WorkerSettings:
     on_startup = startup
     on_shutdown = shutdown
 
-    max_jobs = 10       # একই সময়ে maximum এতগুলো job চলবে
-    job_timeout = 300   # 5 মিনিটের বেশি চললে kill করবে
+    max_jobs = 10  # একই সময়ে maximum এতগুলো job চলবে
+    job_timeout = 300  # 5 মিনিটের বেশি চললে kill করবে

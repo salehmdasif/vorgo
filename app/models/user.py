@@ -1,9 +1,12 @@
 import enum
 from uuid import UUID
-from sqlalchemy import String, Boolean, Enum as SAEnum, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID, ARRAY
-from sqlalchemy.orm import Mapped, mapped_column
+
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID
+from sqlalchemy import Boolean, ForeignKey, String
+from sqlalchemy import Enum as SAEnum
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, TimestampMixin
 

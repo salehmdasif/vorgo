@@ -88,9 +88,14 @@ class TenantService:
 
     async def count(self, model: Type[Base], **filters: Any) -> int:
         from sqlalchemy import func
-        stmt = select(func.count()).select_from(model).where(
-            model.org_id == self.org_id,  # type: ignore[attr-defined]
-            *[getattr(model, k) == v for k, v in filters.items()],
+
+        stmt = (
+            select(func.count())
+            .select_from(model)
+            .where(
+                model.org_id == self.org_id,  # type: ignore[attr-defined]
+                *[getattr(model, k) == v for k, v in filters.items()],
+            )
         )
         result = await self.db.execute(stmt)
         return result.scalar_one()

@@ -1,11 +1,9 @@
-import redis.asyncio as aioredis
-
 from app.core.config import settings
 from app.core.redis import get_redis_pool
 
-
 # Redis key pattern: rt:{user_id}:{jti}
 # TTL = REFRESH_TOKEN_EXPIRE_DAYS
+
 
 def _key(user_id: str, jti: str) -> str:
     return f"rt:{user_id}:{jti}"
@@ -24,9 +22,7 @@ async def refresh_token_exists(user_id: str, jti: str) -> bool:
     return await redis.exists(_key(user_id, jti)) == 1
 
 
-async def rotate_refresh_token(
-    user_id: str, old_jti: str, new_jti: str
-) -> None:
+async def rotate_refresh_token(user_id: str, old_jti: str, new_jti: str) -> None:
     """Atomically deletes old token and stores new token."""
     redis = await get_redis_pool()
     ttl = settings.REFRESH_TOKEN_EXPIRE_DAYS * 86400

@@ -1,11 +1,11 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.auth import current_active_user, current_superuser, current_verified_user
 from app.core.database import get_db, get_db_context
-from app.core.redis import get_redis
-from app.core.auth import current_active_user, current_verified_user, current_superuser
-from app.core.tenancy.service import TenantService, AdminTenantService
 from app.core.exceptions import Errors
+from app.core.redis import get_redis
+from app.core.tenancy.service import AdminTenantService, TenantService
 from app.models.user import User
 
 

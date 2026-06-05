@@ -1,5 +1,5 @@
 import time
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
@@ -15,6 +15,7 @@ _start_time = time.time()
 
 
 # ── Response models ───────────────────────────────────────────────────────────
+
 
 class ServiceStatus(BaseModel):
     database: str
@@ -37,6 +38,7 @@ class MetricsResponse(BaseModel):
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
+
 
 @router.get(
     "/health",
@@ -65,7 +67,9 @@ async def health_check():
         ),
     )
     return JSONResponse(
-        status_code=status.HTTP_200_OK if all_ok else status.HTTP_503_SERVICE_UNAVAILABLE,
+        status_code=(
+            status.HTTP_200_OK if all_ok else status.HTTP_503_SERVICE_UNAVAILABLE
+        ),
         content=response.model_dump(),
     )
 

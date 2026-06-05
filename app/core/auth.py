@@ -4,7 +4,6 @@ from typing import Optional
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
 from fastapi_users.authentication import AuthenticationBackend, BearerTransport
-from app.core.security.jwt import ED25519JWTStrategy
 from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,6 +11,7 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.core.exceptions import Errors
 from app.core.redis import get_redis_pool
+from app.core.security.jwt import ED25519JWTStrategy
 from app.models.user import User
 
 _LOCKOUT_MAX_ATTEMPTS = 5
@@ -44,6 +44,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         except Exception as exc:
             # re-raise AppError (lockout), let others pass through
             from app.core.exceptions import AppError
+
             if isinstance(exc, AppError):
                 raise
             return await super().authenticate(credentials)

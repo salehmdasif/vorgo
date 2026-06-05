@@ -1,7 +1,8 @@
 from typing import AsyncGenerator
-import redis.asyncio as aioredis
-from app.core.config import settings
 
+import redis.asyncio as aioredis
+
+from app.core.config import settings
 
 # module-level pool - app lifetime এ একটাই instance থাকবে
 # প্রতি request এ নতুন connection না নিয়ে pool থেকে নেওয়া হয়

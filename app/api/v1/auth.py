@@ -1,17 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 
-from app.core.auth import fastapi_users, auth_backend, current_active_user
-from app.core.exceptions import AppError, Errors
-from app.core.security.jwt import create_access_token, create_refresh_token, verify_token
+from app.core.auth import auth_backend, current_active_user, fastapi_users
+from app.core.exceptions import Errors
+from app.core.security.jwt import (
+    create_access_token,
+    create_refresh_token,
+    verify_token,
+)
 from app.core.security.tokens import (
-    store_refresh_token,
     refresh_token_exists,
-    rotate_refresh_token,
     revoke_all_refresh_tokens,
+    rotate_refresh_token,
+    store_refresh_token,
 )
 from app.models.user import User
-from app.schemas.user import UserRead, UserCreate
 from app.schemas.auth import RefreshRequest, TokenResponse
+from app.schemas.user import UserCreate, UserRead
 
 router = APIRouter()
 
@@ -48,6 +52,7 @@ router.include_router(
 
 
 # ── Custom endpoints ──────────────────────────────────────────────────────────
+
 
 @router.post(
     "/auth/token",
