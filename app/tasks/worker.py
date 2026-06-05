@@ -2,14 +2,14 @@ from arq.connections import RedisSettings
 from app.core.config import settings
 
 # arq use করা হয়েছে Celery এর বদলে কারণ:
-# - native async — FastAPI এর async context এর সাথে friction নেই
+# - native async - FastAPI এর async context এর সাথে friction নেই
 # - Celery তে async function এ await করতে গেলে আলাদা event loop লাগে
 # - same Redis instance use করে যেটা cache আর rate limiting এও আছে
 
 
 async def startup(ctx: dict) -> None:
     # worker process এর lifetime এ একবার চলে
-    # shared resources এখানে initialize করো — db pool, http client, etc.
+    # shared resources এখানে initialize করো - db pool, http client, etc.
     # commit 14 এ email_service, db connection যোগ হবে
     pass
 

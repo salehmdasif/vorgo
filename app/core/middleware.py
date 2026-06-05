@@ -8,7 +8,7 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
     """
     প্রতিটা request এ unique ID inject করে।
     error log এ request_id দিয়ে Sentry বা structlog এ trace করা যায়।
-    response header এও পাঠায় — frontend থেকে support ticket এ দেওয়া যাবে।
+    response header এও পাঠায় - frontend থেকে support ticket এ দেওয়া যাবে।
     """
 
     async def dispatch(self, request: Request, call_next) -> Response:

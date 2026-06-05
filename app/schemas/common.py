@@ -14,14 +14,14 @@ class ErrorResponse(BaseModel):
 
 
 class SuccessResponse(BaseModel):
-    # simple confirmation response এর জন্য — delete, update, etc.
+    # simple confirmation response এর জন্য - delete, update, etc.
     message: str
     data: dict = {}
 
 
 class PaginatedResponse(BaseModel, Generic[T]):
     # cursor-based pagination এ নয়, offset-based এ use করো
-    # large dataset এ cursor-based prefer করো — commit 6 এ TenantService এ implement হবে
+    # large dataset এ cursor-based prefer করো - commit 6 এ TenantService এ implement হবে
     items: list[T]
     total: int
     page: int

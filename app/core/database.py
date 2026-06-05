@@ -9,8 +9,8 @@ from sqlalchemy import text
 from app.core.config import settings
 
 
-# pool_pre_ping=True — stale connection কে automatically drop করে নতুন নেয়
-# pool_size=20, max_overflow=10 — total max 30 concurrent connections
+# pool_pre_ping=True - stale connection কে automatically drop করে নতুন নেয়
+# pool_size=20, max_overflow=10 - total max 30 concurrent connections
 # production এ এই numbers PostgreSQL এর max_connections এর সাথে মিলিয়ে tune করো
 engine = create_async_engine(
     settings.DATABASE_URL,
@@ -20,7 +20,7 @@ engine = create_async_engine(
     echo=settings.DEBUG,  # DEBUG=True হলে SQL query log এ দেখা যাবে
 )
 
-# expire_on_commit=False — commit এর পরেও object access করা যাবে
+# expire_on_commit=False - commit এর পরেও object access করা যাবে
 # এটা না থাকলে commit এর পরে attribute access এ lazy load error আসে
 AsyncSessionLocal = async_sessionmaker(
     engine,
@@ -30,8 +30,8 @@ AsyncSessionLocal = async_sessionmaker(
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    # FastAPI Depends() এ use করো — request শেষে automatically close হবে
-    # success হলে commit, exception হলে rollback — caller কে ভাবতে হবে না
+    # FastAPI Depends() এ use করো - request শেষে automatically close হবে
+    # success হলে commit, exception হলে rollback - caller কে ভাবতে হবে না
     async with AsyncSessionLocal() as session:
         try:
             yield session

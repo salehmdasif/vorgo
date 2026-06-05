@@ -38,7 +38,7 @@ async def rotate_refresh_token(
 
 async def revoke_all_refresh_tokens(user_id: str) -> None:
     """
-    Logout all devices — deletes every refresh token for this user.
+    Logout all devices - deletes every refresh token for this user.
     Called on: token reuse detected, manual logout-all, password change.
     """
     redis = await get_redis_pool()

@@ -11,19 +11,19 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-this-in-production"
 
     # ── Database ──────────────────────────────────────────────────────────
-    # asyncpg driver required — sync psycopg2 এ async কাজ করবে না
+    # asyncpg driver required - sync psycopg2 এ async কাজ করবে না
     DATABASE_URL: str = "postgresql+asyncpg://vorgo_user:vorgo_pass@localhost:5432/vorgo_db"
 
     # ── Redis ─────────────────────────────────────────────────────────────
     # refresh token, rate limiting, session revocation সব এখানে
     REDIS_URL: str = "redis://localhost:6379/0"
 
-    # ── JWT — ED25519 ─────────────────────────────────────────────────────
+    # ── JWT - ED25519 ─────────────────────────────────────────────────────
     # keys খালি থাকলে app চলবে কিন্তু auth কাজ করবে না
     # `make generate-keys` চালালে .env এ automatically লিখে দেবে
     ED25519_PRIVATE_KEY: str = ""
     ED25519_PUBLIC_KEY: str = ""
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15   # short — refresh token দিয়ে renew হবে
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 15   # short - refresh token দিয়ে renew হবে
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
     # ── Email ─────────────────────────────────────────────────────────────
@@ -37,13 +37,13 @@ class Settings(BaseSettings):
     EMAIL_FROM: str = ""
 
     # ── Stripe ────────────────────────────────────────────────────────────
-    # STRIPE_WEBHOOK_SECRET ছাড়া webhook verify হবে না — সব event skip হবে
+    # STRIPE_WEBHOOK_SECRET ছাড়া webhook verify হবে না - সব event skip হবে
     STRIPE_SECRET_KEY: str = ""
     STRIPE_PUBLISHABLE_KEY: str = ""
     STRIPE_WEBHOOK_SECRET: str = ""
 
     # ── Storage ───────────────────────────────────────────────────────────
-    # AWS S3 বা Cloudflare R2 দুটোই চলবে — endpoint URL বদলালেই হবে
+    # AWS S3 বা Cloudflare R2 দুটোই চলবে - endpoint URL বদলালেই হবে
     S3_ACCESS_KEY: str = ""
     S3_SECRET_KEY: str = ""
     S3_BUCKET: str = ""
@@ -60,7 +60,7 @@ class Settings(BaseSettings):
     SENTRY_DSN: str = ""  # খালি থাকলে Sentry initialize হবে না
 
     # ── 2FA ───────────────────────────────────────────────────────────────
-    # AES-256 key — TOTP secret encrypt করে store করতে লাগে
+    # AES-256 key - TOTP secret encrypt করে store করতে লাগে
     # `python -c "import secrets; print(secrets.token_hex(32))"` দিয়ে generate করো
     TOTP_ENCRYPTION_KEY: str = ""
 
@@ -84,5 +84,5 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
-# module-level singleton — সব জায়গা থেকে `from app.core.config import settings` দিয়ে import করো
+# module-level singleton - সব জায়গা থেকে `from app.core.config import settings` দিয়ে import করো
 settings = Settings()

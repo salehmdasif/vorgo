@@ -26,7 +26,7 @@ async def get_admin_tenant_service(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(current_active_user),
 ) -> AdminTenantService:
-    """No org_id filter — super_admin only. Guard with require_superuser() on the route."""
+    """No org_id filter - super_admin only. Guard with require_superuser() on the route."""
     if not user.is_superuser:
         raise Errors.FORBIDDEN()
     return AdminTenantService(db=db)

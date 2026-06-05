@@ -25,7 +25,7 @@ class AppError(Exception):
 
 
 class ErrorResponse(BaseModel):
-    # সব error response এই format এ যাবে — frontend consistent handling করতে পারবে
+    # সব error response এই format এ যাবে - frontend consistent handling করতে পারবে
     error: str        # "UNAUTHORIZED", "NOT_FOUND", etc.
     message: str      # human-readable
     details: dict     # field-level errors, extra info
@@ -33,7 +33,7 @@ class ErrorResponse(BaseModel):
 
 
 # ── Pre-defined errors ────────────────────────────────────────────────────────
-# lambda use করা হয়েছে — প্রতিটা call এ নতুন instance তৈরি হয়
+# lambda use করা হয়েছে - প্রতিটা call এ নতুন instance তৈরি হয়
 # class attribute হিসেবে রাখলে একই object সব জায়গায় shared হতো
 class Errors:
     UNAUTHORIZED = lambda: AppError(
@@ -63,7 +63,7 @@ class Errors:
         status_code=400,
     )
     # WARNING: এটা raise হলে ওই user এর সব refresh token revoke হবে
-    # token reuse মানে leak হয়েছে — সব session বন্ধ করাই সঠিক
+    # token reuse মানে leak হয়েছে - সব session বন্ধ করাই সঠিক
     TOKEN_REUSE_DETECTED = lambda: AppError(
         code="TOKEN_REUSE_DETECTED",
         message="Security violation detected. All sessions have been revoked.",

@@ -77,12 +77,12 @@ def verify_token(token: str) -> dict[str, Any]:
 class ED25519JWTStrategy(JWTStrategy):
     """
     fastapi-users JWTStrategy subclass.
-    Only write_token and read_token are overridden — everything else stays.
+    Only write_token and read_token are overridden - everything else stays.
     auth_backend in auth.py uses this instead of the default HS256 strategy.
     """
 
     def __init__(self) -> None:
-        # parent __init__ needs a secret — not used since we override sign/verify
+        # parent __init__ needs a secret - not used since we override sign/verify
         super().__init__(
             secret="not-used",
             lifetime_seconds=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
@@ -106,6 +106,6 @@ class ED25519JWTStrategy(JWTStrategy):
             return None
 
     async def destroy_token(self, token, user) -> None:  # type: ignore[override]
-        # access token is stateless — client discards it
+        # access token is stateless - client discards it
         # refresh token revocation is handled in /auth/logout-all
         pass

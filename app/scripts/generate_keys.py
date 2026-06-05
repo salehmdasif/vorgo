@@ -1,9 +1,9 @@
 """
 ED25519 key pair generate করে .env এ লিখে দেয়।
 HS256 না নিয়ে ED25519 নেওয়ার কারণ:
-  - asymmetric — private key দিয়ে sign, public key দিয়ে verify
+  - asymmetric - private key দিয়ে sign, public key দিয়ে verify
   - public key share করা যায় (microservice), private key server এ থাকে
-  - HS256 এ যে secret জানে সে token বানাতেও পারে — এখানে পারবে না
+  - HS256 এ যে secret জানে সে token বানাতেও পারে - এখানে পারবে না
 
 Usage:
     python -m app.scripts.generate_keys
@@ -21,7 +21,7 @@ from cryptography.hazmat.primitives import serialization
 def generate_ed25519_keypair() -> tuple[str, str]:
     private_key = Ed25519PrivateKey.generate()
 
-    # Raw format নেওয়া হয়েছে — PEM এর চেয়ে compact, .env এ রাখা সহজ
+    # Raw format নেওয়া হয়েছে - PEM এর চেয়ে compact, .env এ রাখা সহজ
     # base64 encode করে string হিসেবে রাখা হচ্ছে
     private_bytes = private_key.private_bytes(
         encoding=serialization.Encoding.Raw,
@@ -65,5 +65,5 @@ if __name__ == "__main__":
     private_key, public_key = generate_ed25519_keypair()
     update_env_file(private_key, public_key)
     print("Keys generated and saved to .env")
-    # public key print করা safe — এটা share করা যায়
+    # public key print করা safe - এটা share করা যায়
     print(f"Public Key: {public_key}")

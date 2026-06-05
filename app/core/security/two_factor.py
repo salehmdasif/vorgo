@@ -1,1 +1,1 @@
-# TODO: Commit 10 — TOTP setup, verify, backup codes
+# TODO: Commit 10 - TOTP setup, verify, backup codes

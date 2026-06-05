@@ -103,7 +103,7 @@ async def refresh_tokens(body: RefreshRequest) -> TokenResponse:
     exists = await refresh_token_exists(user_id, old_jti)
 
     if not exists:
-        # Reuse detected — token was already rotated, possible theft
+        # Reuse detected - token was already rotated, possible theft
         await revoke_all_refresh_tokens(user_id)
         raise Errors.TOKEN_REUSE_DETECTED()
 
@@ -126,5 +126,5 @@ async def refresh_tokens(body: RefreshRequest) -> TokenResponse:
 async def logout_all_devices(
     user: User = Depends(current_active_user),
 ) -> None:
-    """Revokes all refresh tokens for this user — logs out every device."""
+    """Revokes all refresh tokens for this user - logs out every device."""
     await revoke_all_refresh_tokens(str(user.id))

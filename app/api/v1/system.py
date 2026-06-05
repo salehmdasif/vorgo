@@ -47,7 +47,7 @@ class MetricsResponse(BaseModel):
 async def health_check():
     """
     Checks DB and Redis.
-    Returns 503 if either is down — load balancers and uptime monitors use this.
+    Returns 503 if either is down - load balancers and uptime monitors use this.
     Point UptimeRobot / BetterStack here.
     """
     db_ok = await check_db_connection()
@@ -77,8 +77,8 @@ async def health_check():
 )
 async def metrics():
     """
-    Lightweight runtime info — uptime, version, environment.
-    Not a replacement for Prometheus/Grafana — just quick visibility.
+    Lightweight runtime info - uptime, version, environment.
+    Not a replacement for Prometheus/Grafana - just quick visibility.
     """
     return MetricsResponse(
         uptime_seconds=round(time.time() - _start_time, 2),

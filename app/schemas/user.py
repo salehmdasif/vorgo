@@ -10,8 +10,8 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
     API response এ যে User data client পাবে।
 
     BaseUser থেকে আসে: id, email, is_active, is_verified, is_superuser
-    hashed_password কখনো expose হয় না — BaseUser এ নেই।
-    totp_secret কখনো expose হয় না — intentionally বাদ।
+    hashed_password কখনো expose হয় না - BaseUser এ নেই।
+    totp_secret কখনো expose হয় না - intentionally বাদ।
     """
 
     org_id: uuid.UUID | None = None
@@ -32,7 +32,7 @@ class UserCreate(schemas.BaseUserCreate):
 
 class UserUpdate(schemas.BaseUserUpdate):
     """
-    Profile update — password optional।
+    Profile update - password optional।
     current_password দিতে হবে password change করতে (fastapi-users enforce করে)।
     """
 

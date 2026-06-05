@@ -11,7 +11,7 @@ from app.models.base import Base
 class TenantService:
     """
     All DB queries go through here for tenant-scoped models.
-    org_id filter is applied automatically — direct queries risk data leaks.
+    org_id filter is applied automatically - direct queries risk data leaks.
 
     Usage in a route:
         tenant = Depends(get_tenant_service)
@@ -70,7 +70,7 @@ class TenantService:
     async def create(self, model: Type[Base], **data: Any) -> Any:
         obj = model(org_id=self.org_id, **data)  # type: ignore[call-arg]
         self.db.add(obj)
-        await self.db.flush()  # get id without committing — session commits at request end
+        await self.db.flush()  # get id without committing - session commits at request end
         await self.db.refresh(obj)
         return obj
 
@@ -98,7 +98,7 @@ class TenantService:
 
 class AdminTenantService:
     """
-    Super admin use only — no org_id filter.
+    Super admin use only - no org_id filter.
     All orgs' data is visible.
     Guard with require_superuser() before injecting this.
     """

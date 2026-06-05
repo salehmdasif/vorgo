@@ -49,20 +49,20 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
             return await super().authenticate(credentials)
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
-        # TODO: Commit 14 — welcome email
+        # TODO: Commit 14 - welcome email
         # TODO: default Organization create, user.org_id set
         pass
 
     async def on_after_forgot_password(
         self, user: User, token: str, request: Optional[Request] = None
     ):
-        # TODO: Commit 6 — password reset link সহ email পাঠাও
+        # TODO: Commit 6 - password reset link সহ email পাঠাও
         pass
 
     async def on_after_request_verify(
         self, user: User, token: str, request: Optional[Request] = None
     ):
-        # TODO: Commit 6 — email verification link সহ email পাঠাও
+        # TODO: Commit 6 - email verification link সহ email পাঠাও
         pass
 
 
@@ -71,9 +71,9 @@ async def get_user_manager(user_db=Depends(get_user_db)):
 
 
 # ── Auth Backend ──────────────────────────────────────────────────────────────
-# Commit 4: temporary HS256 JWT — functional কিন্তু production-ready না
+# Commit 4: temporary HS256 JWT - functional কিন্তু production-ready না
 # Commit 5: get_jwt_strategy() এ ED25519JWTStrategy দিয়ে replace হবে
-# transport আর backend এর বাকি সব same থাকবে — শুধু strategy বদলাবে
+# transport আর backend এর বাকি সব same থাকবে - শুধু strategy বদলাবে
 
 bearer_transport = BearerTransport(tokenUrl="/api/v1/auth/login")
 

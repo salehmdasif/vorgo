@@ -6,7 +6,7 @@ from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
 
 class Base(DeclarativeBase):
-    # সব model এর parent — alembic env.py তে Base.metadata দরকার
+    # সব model এর parent - alembic env.py তে Base.metadata দরকার
     pass
 
 
@@ -32,7 +32,7 @@ class TimestampMixin:
 class BaseModel(TimestampMixin, Base):
     """
     সব primary table এই class extend করবে।
-    UUID primary key — integer id এর চেয়ে:
+    UUID primary key - integer id এর চেয়ে:
     - enumeration attack থেকে safe
     - distributed system এ collision নেই
     - URL এ expose করা যায়
@@ -60,7 +60,7 @@ class TenantMixin:
     Rules:
     - সব tenant-scoped model এ এই mixin use করো
     - TenantService সব query তে org_id filter automatically add করে
-    - Direct query করলে org_id filter ভুলে যাওয়ার risk আছে — TenantService use করো
+    - Direct query করলে org_id filter ভুলে যাওয়ার risk আছে - TenantService use করো
     - organizations table আগে তৈরি হওয়া দরকার (Commit 3 এ হবে)
     """
 
@@ -68,5 +68,5 @@ class TenantMixin:
         PG_UUID(as_uuid=True),
         ForeignKey("organizations.id", ondelete="CASCADE"),
         nullable=False,
-        index=True,  # প্রতিটা query তে org_id filter থাকবে — index ছাড়া full scan হবে
+        index=True,  # প্রতিটা query তে org_id filter থাকবে - index ছাড়া full scan হবে
     )
