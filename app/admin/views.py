@@ -36,8 +36,7 @@ class UserAdmin(ModelView, model=User):
     ]
     column_labels = {User.org_id: "Organization ID"}
 
-    # Exclude security credentials and secrets from admin display and forms
-    column_exclude_list = [User.hashed_password, User.totp_secret, User.backup_codes]
+    # Exclude security credentials and secrets from admin forms
     form_excluded_columns = [
         User.hashed_password,
         User.totp_secret,
