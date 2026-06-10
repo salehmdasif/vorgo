@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # used for refresh tokens, rate limiting, and session revocation
     REDIS_URL: str = "redis://localhost:6379/0"
 
-    # ED25519 keys — leave empty to start, run `make generate-keys` to populate
+    # ED25519 keys - leave empty to start, run `make generate-keys` to populate
     ED25519_PRIVATE_KEY: str = ""
     ED25519_PUBLIC_KEY: str = ""
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
@@ -32,24 +32,27 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     EMAIL_FROM: str = ""
 
-    # Stripe — webhook secret required for webhook verification
+    # Stripe - webhook secret required for webhook verification
     STRIPE_SECRET_KEY: str = ""
     STRIPE_PUBLISHABLE_KEY: str = ""
     STRIPE_WEBHOOK_SECRET: str = ""
+    STRIPE_FREE_PRICE_ID: str = ""
+    STRIPE_PRO_PRICE_ID: str = ""
+    STRIPE_ENTERPRISE_PRICE_ID: str = ""
 
-    # S3-compatible storage — works with AWS S3 and Cloudflare R2
+    # S3-compatible storage - works with AWS S3 and Cloudflare R2
     S3_ACCESS_KEY: str = ""
     S3_SECRET_KEY: str = ""
     S3_BUCKET: str = ""
     S3_ENDPOINT_URL: str = ""
     S3_REGION: str = "us-east-1"
 
-    # AI providers — set whichever you use, leave others empty
+    # AI providers - set whichever you use, leave others empty
     OPENAI_API_KEY: str = ""
     ANTHROPIC_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
 
-    # Sentry — leave empty to disable
+    # Sentry - leave empty to disable
     SENTRY_DSN: str = ""
 
     # AES-256 key for encrypting TOTP secrets at rest
