@@ -5,6 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.admin import setup_admin
 from app.api.v1 import api_router
 from app.core.config import settings
 from app.core.database import check_db_connection, engine
@@ -39,6 +40,8 @@ app = FastAPI(
     redoc_url="/redoc" if settings.DEBUG else None,
     lifespan=lifespan,
 )
+
+setup_admin(app)
 
 # Middleware order matters - last added is outermost.
 # RequestIDMiddleware must be inner so request_id is available in all handlers.
