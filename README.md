@@ -1,4 +1,4 @@
-# Vorgo — FastAPI SaaS Boilerplate
+# Vorgo - FastAPI SaaS Boilerplate
 
 > **Stop assembling. Start building.**
 
@@ -82,8 +82,4 @@ make docker-up      # Start services
 
 ## License
 
-MIT — free for personal and commercial use.
-
----
-
-Built by [Ravelweb Ltd](https://ravelweb.com)
+MIT - free for personal and commercial use.
