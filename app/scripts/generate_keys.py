@@ -4,7 +4,7 @@ Generates an ED25519 key pair and writes it to .env.
 ED25519 over HS256:
   - asymmetric: sign with private key, verify with public key
   - public key can be shared with microservices; private key stays on the server
-  - anyone with an HS256 secret can forge tokens — not possible with ED25519
+  - anyone with an HS256 secret can forge tokens - not possible with ED25519
 
 Usage:
     python -m app.scripts.generate_keys

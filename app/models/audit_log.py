@@ -10,7 +10,7 @@ from app.models.base import BaseModel, TenantMixin
 
 class AuditLog(TenantMixin, BaseModel):
     """
-    Immutable audit trail. Write-only — never update or delete rows.
+    Immutable audit trail. Write-only - never update or delete rows.
 
     Write on: login, logout, password change, member invite/remove,
     subscription change, API key create/revoke, admin impersonation, data export.

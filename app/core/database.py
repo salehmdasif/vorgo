@@ -29,7 +29,7 @@ AsyncSessionLocal = async_sessionmaker(
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    """FastAPI dependency — commits on success, rolls back on exception."""
+    """FastAPI dependency - commits on success, rolls back on exception."""
     async with AsyncSessionLocal() as session:
         try:
             yield session

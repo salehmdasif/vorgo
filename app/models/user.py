@@ -24,13 +24,13 @@ class User(SQLAlchemyBaseUserTableUUID, TimestampMixin, Base):
     Inherited from SQLAlchemyBaseUserTableUUID:
         id, email, hashed_password, is_active, is_verified, is_superuser
 
-    Do not extend BaseModel — id conflict.
+    Do not extend BaseModel - id conflict.
     TimestampMixin and Base are extended separately.
     """
 
     __tablename__ = "users"
 
-    # nullable — super_admin has no org, regular users always have one
+    # nullable - super_admin has no org, regular users always have one
     # SET NULL on org delete to preserve user accounts
     org_id: Mapped[UUID | None] = mapped_column(
         PG_UUID(as_uuid=True),
@@ -56,7 +56,7 @@ class User(SQLAlchemyBaseUserTableUUID, TimestampMixin, Base):
         nullable=False,
     )
 
-    # 8 bcrypt-hashed one-time backup codes — delete each after use
+    # 8 bcrypt-hashed one-time backup codes - delete each after use
     backup_codes: Mapped[list] = mapped_column(
         ARRAY(String),
         default=list,

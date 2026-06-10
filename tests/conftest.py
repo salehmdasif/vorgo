@@ -7,8 +7,8 @@ from app.main import app
 from app.core.config import settings
 from app.models.base import Base
 
-# main DB এর বদলে আলাদা test DB — production data কখনো touch হবে না
-# DB name: vorgo_db → vorgo_test_db
+# Use a separate test DB instead of the main DB - production data will never be touched
+# DB name: vorgo_db -> vorgo_test_db
 TEST_DATABASE_URL = settings.DATABASE_URL.replace(
     "/vorgo_db", "/vorgo_test_db"
 )
@@ -19,8 +19,8 @@ TestSessionLocal = async_sessionmaker(test_engine, expire_on_commit=False)
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
 async def setup_test_db():
-    # test session শুরুতে সব table তৈরি করো, শেষে drop করো
-    # autouse=True — প্রতিটা test file এ manually call করতে হবে না
+    # Create all tables at the start of the test session, drop them at the end
+    # autouse=True - no need to call manually in every test file
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
@@ -31,8 +31,8 @@ async def setup_test_db():
 
 @pytest_asyncio.fixture
 async def db_session() -> AsyncSession:
-    # প্রতিটা test এর শেষে rollback — test isolation ensure করে
-    # একটা test এর data অন্য test এ leak করে না
+    # Rollback at the end of each test - ensures test isolation
+    # Data from one test does not leak into other tests
     async with TestSessionLocal() as session:
         yield session
         await session.rollback()
@@ -40,8 +40,8 @@ async def db_session() -> AsyncSession:
 
 @pytest_asyncio.fixture
 async def async_client() -> AsyncClient:
-    # real HTTP request না করে ASGI transport এ সরাসরি app call করে
-    # network overhead নেই, test fast
+    # Calls the app directly via ASGI transport instead of making real HTTP requests
+    # No network overhead, fast tests
     async with AsyncClient(
         transport=ASGITransport(app=app),
         base_url="http://test",

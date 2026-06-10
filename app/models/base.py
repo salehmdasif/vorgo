@@ -29,7 +29,7 @@ class TimestampMixin:
 class BaseModel(TimestampMixin, Base):
     """
     Base class for all primary tables.
-    UUID primary key — safe from enumeration, collision-free in distributed systems.
+    UUID primary key - safe from enumeration, collision-free in distributed systems.
     """
 
     __abstract__ = True
