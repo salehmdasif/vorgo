@@ -10,7 +10,14 @@ from app.api.v1 import api_router
 from app.core.config import settings
 from app.core.database import check_db_connection, engine
 from app.core.exceptions import AppError, ErrorResponse
-from app.core.middleware import RequestIDMiddleware, SecurityHeadersMiddleware
+from slowapi.errors import RateLimitExceeded
+
+from app.core.middleware import (
+    RequestIDMiddleware,
+    SecurityHeadersMiddleware,
+    TenantMiddleware,
+)
+from app.core.rate_limit import limiter
 from app.core.redis import check_redis_connection, close_redis_pool
 
 
@@ -40,6 +47,7 @@ app = FastAPI(
     redoc_url="/redoc" if settings.DEBUG else None,
     lifespan=lifespan,
 )
+app.state.limiter = limiter
 
 setup_admin(app)
 
@@ -47,6 +55,7 @@ setup_admin(app)
 # RequestIDMiddleware must be inner so request_id is available in all handlers.
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RequestIDMiddleware)
+app.add_middleware(TenantMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -61,6 +70,22 @@ if settings.SENTRY_DSN:
     sentry_sdk.init(
         dsn=settings.SENTRY_DSN,
         environment=settings.ENVIRONMENT,
+    )
+
+
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_exceeded_handler(
+    request: Request, exc: RateLimitExceeded
+) -> JSONResponse:
+    request_id = getattr(request.state, "request_id", "unknown")
+    return JSONResponse(
+        status_code=429,
+        content=ErrorResponse(
+            error="RATE_LIMITED",
+            message="Too many requests. Slow down.",
+            details={},
+            request_id=request_id,
+        ).model_dump(),
     )
 
 

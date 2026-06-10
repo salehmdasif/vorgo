@@ -90,3 +90,25 @@ async def metrics():
         environment=settings.ENVIRONMENT,
         debug=settings.DEBUG,
     )
+
+
+from fastapi import Request
+
+
+@router.get("/test-tenant")
+async def test_tenant(request: Request):
+    return {
+        "org_slug": request.state.org_slug,
+        "org_id": str(request.state.org_id) if request.state.org_id else None,
+    }
+
+
+from app.core.rate_limit import limiter, dynamic_rate_limit
+
+
+@router.get("/test-rate-limit")
+@limiter.limit(dynamic_rate_limit)
+async def test_rate_limiting(request: Request):
+    return {"status": "ok"}
+
+
