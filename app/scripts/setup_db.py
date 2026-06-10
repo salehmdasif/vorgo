@@ -12,15 +12,27 @@ from app.models.user import User, UserRole
 
 
 async def create_db() -> None:
+    import urllib.parse
+
     url = settings.DATABASE_URL
     if url.startswith("postgresql+asyncpg://"):
         url = url.replace("postgresql+asyncpg://", "postgresql://")
 
-    base_url, db_name = url.rsplit("/", 1)
-    postgres_url = f"{base_url}/postgres"
+    parsed = urllib.parse.urlparse(url)
+    user = parsed.username
+    password = parsed.password
+    host = parsed.hostname
+    port = parsed.port or 5432
+    db_name = parsed.path.lstrip("/")
 
     print(f"Connecting to system database 'postgres' to check for database '{db_name}'...")
-    conn = await asyncpg.connect(postgres_url)
+    conn = await asyncpg.connect(
+        user=user,
+        password=password,
+        host=host,
+        port=port,
+        database="postgres",
+    )
     exists = await conn.fetchval("SELECT 1 FROM pg_database WHERE datname = $1", db_name)
     if not exists:
         print(f"Database '{db_name}' does not exist. Creating it now...")
