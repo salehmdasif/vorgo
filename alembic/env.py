@@ -8,20 +8,20 @@ from alembic import context
 from app.core.config import settings
 from app.models.base import Base  # noqa: F401
 
-# ── Model imports ──────────────────────────────────────────────────────────────
-# নতুন model তৈরি করলে নিচে import করো।
-# না করলে `make migration` এ autogenerate নতুন table detect করবে না।
-# import order matter করে না — alembic dependency graph নিজে resolve করে।
+# -- Model imports -------------------------------------------------------------
+# Import new models below.
+# Otherwise, 'make migration' autogenerate will not detect the new table.
+# Import order does not matter - alembic resolves the dependency graph itself.
 
-# Commit 3 — core models
+# Commit 3 - core models
 from app.models.organization import Organization  # noqa: F401
 from app.models.user import User                  # noqa: F401
 from app.models.audit_log import AuditLog         # noqa: F401
 
 # Commit 5+:
+from app.models.feature_flag import FeatureFlag   # noqa: F401
 # from app.models.invitation import Invitation      # noqa: F401
 # from app.models.api_key import APIKey             # noqa: F401
-# from app.models.feature_flag import FeatureFlag   # noqa: F401
 # from app.models.ai_usage import AIUsage           # noqa: F401
 # from app.models.webhook import WebhookEndpoint, WebhookDelivery  # noqa: F401
 
@@ -30,16 +30,16 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# alembic.ini এর url override করছি — settings থেকে নেওয়া দরকার
-# hardcode করলে environment আলাদা হলে ভুল DB তে migration চলবে
+# Override the url in alembic.ini - it needs to be taken from settings
+# Hardcoding it could run migrations on the wrong database if the environment changes
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    # `alembic upgrade head --sql` — actual DB connection ছাড়া SQL generate করে
-    # CI/CD এ dry-run বা DBA review এর জন্য useful
+    # `alembic upgrade head --sql` - generates SQL without an actual DB connection
+    # Useful for dry-runs in CI/CD or DBA review
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -58,8 +58,8 @@ def do_run_migrations(connection: Connection) -> None:
 
 
 async def run_async_migrations() -> None:
-    # NullPool — migration এ connection pool দরকার নেই
-    # pool রাখলে migration শেষে connection hang করতে পারে
+    # NullPool - connection pool is not needed for migrations
+    # Keeping the pool might cause connections to hang after migration
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",

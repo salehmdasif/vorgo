@@ -4,7 +4,7 @@ from sqladmin import Admin
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.admin.auth import AdminAuth
-from app.admin.views import AuditLogAdmin, OrganizationAdmin, UserAdmin
+from app.admin.views import AuditLogAdmin, OrganizationAdmin, UserAdmin, FeatureFlagAdmin
 from app.core.config import settings
 from app.core.database import engine
 
@@ -33,3 +33,4 @@ def setup_admin(app: FastAPI) -> None:
     admin.add_view(UserAdmin)
     admin.add_view(OrganizationAdmin)
     admin.add_view(AuditLogAdmin)
+    admin.add_view(FeatureFlagAdmin)

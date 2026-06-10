@@ -1,7 +1,10 @@
 # ── Imports ───────────────────────────────────────────────────────────────────
 from sqladmin import ModelView
+from starlette.requests import Request
+from typing import Any
 
 from app.models.audit_log import AuditLog
+from app.models.feature_flag import FeatureFlag
 from app.models.organization import Organization
 from app.models.user import User
 
@@ -93,3 +96,45 @@ class AuditLogAdmin(ModelView, model=AuditLog):
     can_create = False
     can_edit = False
     can_delete = False
+
+
+class FeatureFlagAdmin(ModelView, model=FeatureFlag):
+    """Admin view configuration for the FeatureFlag model."""
+
+    column_list = [
+        FeatureFlag.id,
+        FeatureFlag.name,
+        FeatureFlag.description,
+        FeatureFlag.enabled_globally,
+        FeatureFlag.created_at,
+    ]
+    column_searchable_list = [FeatureFlag.name, FeatureFlag.description]
+    column_filters = [FeatureFlag.enabled_globally]
+    form_columns = [
+        FeatureFlag.name,
+        FeatureFlag.description,
+        FeatureFlag.enabled_globally,
+        FeatureFlag.enabled_for_plans,
+        FeatureFlag.enabled_for_orgs,
+    ]
+
+    async def on_model_change(
+        self, data: dict, model: Any, is_created: bool, request: Request
+    ) -> None:
+        """Invalidate cache on creation or update."""
+        if hasattr(model, "name") and model.name:
+            from app.services.feature_flag_service import (
+                invalidate_feature_flag_cache,
+            )
+
+            await invalidate_feature_flag_cache(model.name)
+
+    async def on_model_delete(self, model: Any, request: Request) -> None:
+        """Invalidate cache on deletion."""
+        if hasattr(model, "name") and model.name:
+            from app.services.feature_flag_service import (
+                invalidate_feature_flag_cache,
+            )
+
+            await invalidate_feature_flag_cache(model.name)
+
