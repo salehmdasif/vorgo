@@ -19,8 +19,8 @@ async def create_db() -> None:
         url = url.replace("postgresql+asyncpg://", "postgresql://")
 
     parsed = urllib.parse.urlparse(url)
-    user = parsed.username
-    password = parsed.password
+    user = urllib.parse.unquote(parsed.username) if parsed.username else None
+    password = urllib.parse.unquote(parsed.password) if parsed.password else None
     host = parsed.hostname
     port = parsed.port or 5432
     db_name = parsed.path.lstrip("/")
