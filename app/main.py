@@ -40,7 +40,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Middleware order matters — last added is outermost.
+# Middleware order matters - last added is outermost.
 # RequestIDMiddleware must be inner so request_id is available in all handlers.
 app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RequestIDMiddleware)
