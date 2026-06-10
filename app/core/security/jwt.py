@@ -60,6 +60,19 @@ def create_refresh_token(user_id: str) -> tuple[str, str]:
     return token, jti
 
 
+def create_pre_2fa_token(user_id: str) -> str:
+    """Returns a short-lived token (5 min) used only to answer 2FA challenge."""
+    private_key = load_private_key()
+    payload: dict[str, Any] = {
+        "sub": user_id,
+        "type": "pre_2fa",
+        "jti": str(uuid.uuid4()),
+        "iat": datetime.now(UTC),
+        "exp": datetime.now(UTC) + timedelta(minutes=5),
+    }
+    return jwt.encode(payload, private_key, algorithm="EdDSA")
+
+
 def verify_token(token: str) -> dict[str, Any]:
     """Raises jwt.PyJWTError on failure."""
     public_key = load_public_key()
