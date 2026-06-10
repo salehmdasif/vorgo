@@ -7,6 +7,7 @@ from app.models.audit_log import AuditLog
 from app.models.feature_flag import FeatureFlag
 from app.models.organization import Organization
 from app.models.user import User
+from app.models.invitation import Invitation
 
 # ── Model Views ───────────────────────────────────────────────────────────────
 
@@ -138,3 +139,28 @@ class FeatureFlagAdmin(ModelView, model=FeatureFlag):
 
             await invalidate_feature_flag_cache(model.name)
 
+
+class InvitationAdmin(ModelView, model=Invitation):
+    """Admin view configuration for the Invitation model."""
+
+    column_list = [
+        Invitation.id,
+        Invitation.org_id,
+        Invitation.email,
+        Invitation.role,
+        Invitation.invited_by,
+        Invitation.expires_at,
+        Invitation.accepted_at,
+        Invitation.created_at,
+    ]
+    column_searchable_list = [Invitation.email, Invitation.token]
+    column_filters = [Invitation.role, Invitation.accepted_at]
+    form_columns = [
+        Invitation.org_id,
+        Invitation.email,
+        Invitation.token,
+        Invitation.role,
+        Invitation.invited_by,
+        Invitation.expires_at,
+        Invitation.accepted_at,
+    ]

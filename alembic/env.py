@@ -20,7 +20,7 @@ from app.models.audit_log import AuditLog         # noqa: F401
 
 # Commit 5+:
 from app.models.feature_flag import FeatureFlag   # noqa: F401
-# from app.models.invitation import Invitation      # noqa: F401
+from app.models.invitation import Invitation      # noqa: F401
 # from app.models.api_key import APIKey             # noqa: F401
 # from app.models.ai_usage import AIUsage           # noqa: F401
 # from app.models.webhook import WebhookEndpoint, WebhookDelivery  # noqa: F401
