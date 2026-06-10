@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<p>Hello,</p>
+<p>Thank you for signing up. Please verify your email by clicking the link below:</p>
+<p><a href="{{ verify_link }}" class="button" style="color: #ffffff;">Verify Email</a></p>
+<p>If the button doesn't work, copy and paste this link into your browser:</p>
+<p>{{ verify_link }}</p>
+{% endblock %}

@@ -47,21 +47,67 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
             return await super().authenticate(credentials)
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
-        # TODO: send welcome email (Commit 14)
-        # TODO: create default Organization and set user.org_id
-        pass
+        from datetime import datetime, timedelta, timezone
+        from sqlalchemy import select
+        from app.core.database import get_db_context
+        from app.models.organization import Organization, PlanType, SubscriptionStatus
+        from app.models.user import UserRole
+        from app.services.email_service import email_service
+
+        async with get_db_context() as db:
+            stmt = select(User).where(User.id == user.id)
+            res = await db.execute(stmt)
+            db_user = res.scalar_one()
+
+            if not db_user.org_id:
+                org_name = f"{db_user.email.split('@')[0]}'s Workspace"
+                slug_base = db_user.email.split("@")[0].lower()
+                org = Organization(
+                    name=org_name,
+                    slug=f"{slug_base}-{uuid.uuid4().hex[:6]}",
+                    plan=PlanType.FREE,
+                    subscription_status=SubscriptionStatus.TRIALING,
+                    trial_ends_at=datetime.now(timezone.utc) + timedelta(days=14),
+                    is_active=True,
+                )
+                db.add(org)
+                await db.commit()
+                await db.refresh(org)
+
+                db_user.org_id = org.id
+                db_user.role = UserRole.ADMIN
+                await db.commit()
+
+        await email_service.send_email(
+            to_email=user.email,
+            subject="Welcome to Vorgo",
+            template_name="welcome.html",
+            context={"user_name": user.email},
+        )
 
     async def on_after_forgot_password(
         self, user: User, token: str, request: Optional[Request] = None
     ):
-        # TODO: send password reset email (Commit 14)
-        pass
+        from app.services.email_service import email_service
+        reset_link = f"{settings.FRONTEND_URL}/reset-password?token={token}"
+        await email_service.send_email(
+            to_email=user.email,
+            subject="Reset Your Password",
+            template_name="reset_password.html",
+            context={"reset_link": reset_link},
+        )
 
     async def on_after_request_verify(
         self, user: User, token: str, request: Optional[Request] = None
     ):
-        # TODO: send email verification link (Commit 14)
-        pass
+        from app.services.email_service import email_service
+        verify_link = f"{settings.FRONTEND_URL}/verify-email?token={token}"
+        await email_service.send_email(
+            to_email=user.email,
+            subject="Verify Your Email",
+            template_name="verify.html",
+            context={"verify_link": verify_link},
+        )
 
 
 async def get_user_manager(user_db=Depends(get_user_db)):

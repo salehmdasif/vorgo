@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<p>Hello,</p>
+<p>You have been invited to join <strong>{{ org_name }}</strong> as a <strong>{{ role }}</strong>.</p>
+<p>Please accept the invitation by clicking the link below:</p>
+<p><a href="{{ accept_link }}" class="button" style="color: #ffffff;">Accept Invitation</a></p>
+<p>If you do not want to join, you can safely ignore this email.</p>
+{% endblock %}

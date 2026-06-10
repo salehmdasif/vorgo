@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     SECRET_KEY: str = "change-this-in-production"
 
-    # asyncpg driver required — do not switch to sync psycopg2
+    # asyncpg driver required - do not switch to sync psycopg2
     DATABASE_URL: str = (
         "postgresql+asyncpg://vorgo_user:vorgo_pass@localhost:5432/vorgo_db"
     )

@@ -66,7 +66,27 @@ async def create_invitation(
     await db.commit()
     await db.refresh(invitation)
 
-    # TODO: Enqueue email send task via arq in Commit 14
+    # 4. Send email invitation
+    from app.core.config import settings
+    from app.models.organization import Organization
+    
+    stmt_org = select(Organization.name).where(Organization.id == org_id)
+    res_org = await db.execute(stmt_org)
+    org_name = res_org.scalar_one()
+
+    from app.services.email_service import email_service
+    accept_link = f"{settings.FRONTEND_URL}/accept-invitation?token={token}"
+    await email_service.send_email(
+        to_email=email_lower,
+        subject=f"Invitation to join {org_name}",
+        template_name="invitation.html",
+        context={
+            "org_name": org_name,
+            "role": role.value,
+            "accept_link": accept_link,
+        },
+    )
+
     return invitation
 
 
