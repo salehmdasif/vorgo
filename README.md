@@ -16,7 +16,8 @@ Production-ready FastAPI SaaS boilerplate. Python-only stack. No React required.
 |---|---|---|---|
 | Price | Free | $249+ | Free (MIT) |
 | Framework | FastAPI | Django | FastAPI |
-| React required | Yes | Yes | **No** |
+| React required | Yes | Yes | **No (Optional)** |
+| Frontend Flexibility | React Only | Limited | **Any (Next.js/HTMX/Vanilla)** |
 | Admin Panel | No | Yes | **Yes** |
 | Multi-tenancy | No | Yes | **Yes** |
 | Stripe Billing | No | Yes | **Yes** |
