@@ -29,7 +29,7 @@ def upgrade() -> None:
         sa.Column("token", sa.String(length=255), nullable=False),
         sa.Column(
             "role",
-            sa.Enum("super_admin", "admin", "user", name="user_role"),
+            postgresql.ENUM("super_admin", "admin", "user", name="user_role", create_type=False),
             nullable=False,
         ),
         sa.Column("invited_by", sa.UUID(), nullable=True),

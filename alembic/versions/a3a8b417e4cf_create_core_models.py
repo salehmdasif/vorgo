@@ -45,18 +45,19 @@ def upgrade() -> None:
         sa.Column("slug", sa.String(length=100), nullable=False),
         sa.Column(
             "plan",
-            sa.Enum("free", "pro", "enterprise", name="plan_type"),
+            postgresql.ENUM("free", "pro", "enterprise", name="plan_type", create_type=False),
             nullable=False,
         ),
         sa.Column(
             "subscription_status",
-            sa.Enum(
+            postgresql.ENUM(
                 "trialing",
                 "active",
                 "past_due",
                 "canceled",
                 "unpaid",
                 name="subscription_status",
+                create_type=False,
             ),
             nullable=False,
         ),
@@ -87,7 +88,7 @@ def upgrade() -> None:
         sa.Column("org_id", sa.UUID(), nullable=True),
         sa.Column(
             "role",
-            sa.Enum("super_admin", "admin", "user", name="user_role"),
+            postgresql.ENUM("super_admin", "admin", "user", name="user_role", create_type=False),
             nullable=False,
         ),
         sa.Column("totp_secret", sa.String(length=255), nullable=True),

@@ -23,56 +23,39 @@ RATE_LIMITS = {
 }
 
 
-async def dynamic_rate_limit(request: Request) -> str:
+_mock_limit = None
+
+
+def dynamic_rate_limit(request: Request = None) -> str:
     """
     Resolves the appropriate rate limit string based on the user's organization plan.
-    Uses Redis caching to avoid database queries on every HTTP request.
+    Uses pre-fetched plan from TenantMiddleware request state.
     """
+    if _mock_limit is not None:
+        return _mock_limit
+
+    if request is None:
+        import inspect
+        from starlette.requests import Request as StarletteRequest
+        for frame_info in inspect.stack():
+            if "request" in frame_info.frame.f_locals:
+                obj = frame_info.frame.f_locals["request"]
+                if isinstance(obj, StarletteRequest):
+                    request = obj
+                    break
+            if "self" in frame_info.frame.f_locals:
+                self_obj = frame_info.frame.f_locals["self"]
+                if hasattr(self_obj, "request") and isinstance(getattr(self_obj, "request"), StarletteRequest):
+                    request = self_obj.request
+                    break
+
+    if not request:
+        return "100/hour"
+
+    # Default fallback limit for unauthenticated requests
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.lower().startswith("bearer "):
         return "20/minute"
 
-    token = auth_header.split(" ")[1]
-    try:
-        from app.core.redis import get_redis_pool
-        from app.core.security.jwt import verify_token
-
-        # Verify access token signature and get user ID
-        payload = verify_token(token)
-        user_id = payload.get("sub")
-        if not user_id:
-            return "20/minute"
-
-        redis = await get_redis_pool()
-        cache_key = f"user_plan:{user_id}"
-        
-        # 1. Attempt to get plan from Redis cache
-        cached_plan = await redis.get(cache_key)
-        if cached_plan:
-            plan = cached_plan.decode() if isinstance(cached_plan, bytes) else cached_plan
-            return RATE_LIMITS.get(plan, "100/hour")
-
-        # 2. Database lookup on cache miss
-        from app.core.database import get_db_context
-        from app.models.organization import Organization
-        from app.models.user import User
-
-        async with get_db_context() as db:
-            stmt = select(User.org_id).where(User.id == UUID(user_id))
-            res = await db.execute(stmt)
-            org_id = res.scalar_one_or_none()
-
-            if org_id:
-                stmt_org = select(Organization.plan).where(Organization.id == org_id)
-                res_org = await db.execute(stmt_org)
-                plan_enum = res_org.scalar_one_or_none()
-                if plan_enum:
-                    plan = plan_enum.value
-                    # Cache in Redis for 10 minutes (600 seconds)
-                    await redis.setex(cache_key, 600, plan)
-                    return RATE_LIMITS.get(plan, "100/hour")
-    except Exception as e:
-        logger.error(f"Failed to evaluate dynamic rate limit: {e}")
-
-    # Default fallback limit for authenticated users
-    return "100/hour"
+    plan = getattr(request.state, "plan", "free")
+    return RATE_LIMITS.get(plan, "100/hour")

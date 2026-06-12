@@ -48,6 +48,8 @@ async def test_send_email_direct_smtp() -> None:
         "app.core.config.settings.SMTP_USER", "test@test.com"
     ), patch(
         "app.core.config.settings.SMTP_PASSWORD", "secret"
+    ), patch(
+        "app.core.config.settings.EMAIL_FROM", "test@test.com"
     ):
         mock_smtp_class.return_value.__enter__.return_value = mock_smtp_instance
 

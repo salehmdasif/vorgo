@@ -113,7 +113,10 @@ async def test_get_invitation_details(
     res = await async_client.post(
         "/api/v1/invitations/invite", json=payload, headers=headers
     )
-    invitation_token = res.json()["token"]
+    assert res.status_code == 200
+    stmt = select(Invitation.token).where(Invitation.email == "invitee@test.com")
+    db_res = await db_session.execute(stmt)
+    invitation_token = db_res.scalar_one()
 
     # Retrieve details publicly using token
     details_res = await async_client.get(
@@ -139,7 +142,10 @@ async def test_accept_invitation_new_user(
     res = await async_client.post(
         "/api/v1/invitations/invite", json=payload, headers=headers
     )
-    invitation_token = res.json()["token"]
+    assert res.status_code == 200
+    stmt = select(Invitation.token).where(Invitation.email == "invited_new@test.com")
+    db_res = await db_session.execute(stmt)
+    invitation_token = db_res.scalar_one()
 
     # Accept invitation
     accept_payload = {"token": invitation_token, "password": "newpassword123"}
@@ -185,7 +191,10 @@ async def test_accept_invitation_existing_user(
     res = await async_client.post(
         "/api/v1/invitations/invite", json=payload, headers=headers
     )
-    invitation_token = res.json()["token"]
+    assert res.status_code == 200
+    stmt = select(Invitation.token).where(Invitation.email == "existing_member@test.com")
+    db_res = await db_session.execute(stmt)
+    invitation_token = db_res.scalar_one()
 
     # Accept invitation
     accept_payload = {"token": invitation_token}

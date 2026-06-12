@@ -37,13 +37,13 @@ class Organization(BaseModel):
     )
 
     plan: Mapped[PlanType] = mapped_column(
-        SAEnum(PlanType, name="plan_type", create_type=True),
+        SAEnum(PlanType, name="plan_type", create_type=True, values_callable=lambda obj: [e.value for e in obj]),
         default=PlanType.FREE,
         nullable=False,
     )
 
     subscription_status: Mapped[SubscriptionStatus] = mapped_column(
-        SAEnum(SubscriptionStatus, name="subscription_status", create_type=True),
+        SAEnum(SubscriptionStatus, name="subscription_status", create_type=True, values_callable=lambda obj: [e.value for e in obj]),
         default=SubscriptionStatus.TRIALING,
         nullable=False,
     )

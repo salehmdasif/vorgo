@@ -45,6 +45,9 @@ class TenantMiddleware(BaseHTTPMiddleware):
     """
 
     async def dispatch(self, request: Request, call_next) -> Response:
+        from app.models.user import User
+        from app.core.security.jwt import verify_token
+
         host = request.headers.get("host", "")
         host_name = host.split(":")[0]
         parts = host_name.split(".")
@@ -90,5 +93,35 @@ class TenantMiddleware(BaseHTTPMiddleware):
                             await redis.setex(redis_key, 3600, str(org.id))
                         except Exception as e:
                             logger.error(f"Failed to cache subdomain in Redis: {e}")
+
+        # Resolve user plan for rate limiting
+        request.state.plan = "free"
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.lower().startswith("bearer "):
+            token = auth_header.split(" ")[1]
+            try:
+                payload = verify_token(token)
+                user_id = payload.get("sub")
+                if user_id:
+                    redis = await get_redis_pool()
+                    cache_key = f"user_plan:{user_id}"
+                    cached_plan = await redis.get(cache_key)
+                    if cached_plan:
+                        request.state.plan = cached_plan.decode() if isinstance(cached_plan, bytes) else cached_plan
+                    else:
+                        async with get_db_context() as db:
+                            stmt = select(User.org_id).where(User.id == UUID(user_id))
+                            res = await db.execute(stmt)
+                            org_id = res.scalar_one_or_none()
+                            if org_id:
+                                stmt_org = select(Organization.plan).where(Organization.id == org_id)
+                                res_org = await db.execute(stmt_org)
+                                plan_enum = res_org.scalar_one_or_none()
+                                if plan_enum:
+                                    plan = plan_enum.value
+                                    request.state.plan = plan
+                                    await redis.setex(cache_key, 600, plan)
+            except Exception as e:
+                logger.error(f"Failed to resolve user plan in TenantMiddleware: {e}")
 
         return await call_next(request)

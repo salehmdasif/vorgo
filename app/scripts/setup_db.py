@@ -94,14 +94,12 @@ async def create_admin() -> None:
         print(f"Password: {password}")
 
 
-async def main() -> None:
-    await create_db()
-    # Wait a brief moment for PostgreSQL database registry
-    await asyncio.sleep(1)
+def main() -> None:
+    asyncio.run(create_db())
     run_migrations()
-    await create_admin()
+    asyncio.run(create_admin())
     print("\nInitialization complete! You can now run the app.")
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

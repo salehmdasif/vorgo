@@ -6,7 +6,7 @@ from unittest.mock import patch
 @pytest.mark.asyncio
 async def test_rate_limiting_triggered(async_client: AsyncClient) -> None:
     # Force dynamic rate limit to a very low value for testing
-    with patch("app.core.rate_limit.dynamic_rate_limit", return_value="2/minute"):
+    with patch("app.core.rate_limit._mock_limit", "2/minute"):
         # Make first request
         res1 = await async_client.get("/api/v1/test-rate-limit")
         assert res1.status_code == 200
