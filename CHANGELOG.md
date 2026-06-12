@@ -6,7 +6,30 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
-## [Unreleased]
+## [0.3.0] - 2026-06-12
+
+### Added
+- **Tenant Invitation System**
+  - Schema, model, endpoints (`POST /invite`, `GET /token/{token}`, `POST /accept`, `DELETE /{id}`)
+  - Invitation verification, acceptance flow, and role assignments
+- **Dynamic Rate Limiting**
+  - Integration with `slowapi` and Redis backend
+  - Sync-safe `dynamic_rate_limit` wrapper with stack inspection for request retrieval
+  - Pre-fetching organization plan subscription tiers in `TenantMiddleware`
+
+### Fixed
+- **PostgreSQL Enum Type Mapping**
+  - Updated Alembic migrations (`create_core_models.py`, `create_invitations.py`) to map enums using `postgresql.ENUM` with `create_type=False` to handle existing schemas.
+  - Added `values_callable=lambda obj: [e.value for e in obj]` to SQLAlchemy `Enum` models to prevent case mismatch between Python names and database values.
+- **Database Migrations Event Loop Bug**
+  - Fixed sync-async event loop isolation in `setup_db.py` to prevent nested loop exceptions.
+- **Pytest Event Loop and DB Isolation**
+  - Resolved `attached to a different loop` exceptions in `pytest-asyncio` by adding a session-scoped `event_loop` fixture and a pytest hook to align test loop scopes.
+  - Added `clean_database_and_redis` autouse fixture to wipe out DB tables and Redis between tests, ensuring proper test isolation and preventing cache/data leaks.
+  - Fixed invitation tests to retrieve tokens directly from the database instead of expecting them in `InvitationResponse`.
+  - Fixed direct SMTP email test by patching `EMAIL_FROM` to match config expectations.
+- **Email Rendering**
+  - Fixed Jinja welcome email template to correctly render `user_name`.
 
 ## [0.2.0] - 2026-06-05
 

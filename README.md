@@ -23,20 +23,58 @@ Production-ready FastAPI SaaS boilerplate. Python-only stack. No React required.
 | AI Integration | No | No | **Yes** |
 | 2FA | No | No | **Yes** |
 
-## Quick Start
+## Quick Start (With Docker)
 
 ```bash
 git clone https://github.com/ravelweb/vorgo.git
 cd vorgo
 pip install -r requirements.txt
 cp .env.example .env
-make generate-keys     # ED25519 key pair তৈরি করে
-make docker-up         # PostgreSQL + Redis চালু করে
-make migrate           # Database schema তৈরি করে
-make run               # App চালু করে
+make generate-keys     # Generate ED25519 key pair
+make docker-up         # Start PostgreSQL + Redis
+make migrate           # Run database migrations
+make run               # Start the application
 ```
 
 Open: http://localhost:8000/docs
+
+## Local Setup (Without Docker)
+
+If you prefer to run the services natively on your host machine:
+
+1. **Install PostgreSQL & Redis**:
+   - Ensure PostgreSQL is running (default port `5432`).
+   - Ensure Redis is running (default port `6379`).
+2. **Configure Environment**:
+   - Copy `.env.example` to `.env`.
+   - Update `DATABASE_URL` and `REDIS_URL` in `.env` with your local credentials.
+   - Run `make generate-keys` to generate secure ED25519 token signing keys.
+3. **Initialize Databases**:
+   - Create the development database (`vorgo_db`) and test database (`vorgo_test_db`) manually or use the helper script:
+     ```bash
+     python -m app.scripts.create_test_db
+     ```
+   - Apply migrations and seed the default superuser (`admin`/`admin123`):
+     ```bash
+     python -m app.scripts.setup_db
+     ```
+4. **Run Server & Worker**:
+   - Start the development server:
+     ```bash
+     make run
+     ```
+   - Start the arq task worker:
+     ```bash
+     make run-worker
+     ```
+
+## Testing
+
+Ensure your databases and Redis are running locally. The test suite automatically isolates itself on `vorgo_test_db` and flushes test cache keys.
+
+```bash
+make test
+```
 
 ## Stack
 
@@ -79,6 +117,25 @@ make lint           # Lint check
 make format         # Auto-format
 make docker-up      # Start services
 ```
+
+## Production Checklist
+
+Before launching your SaaS to production, complete the following checklist:
+
+1. **Security & Secrets**:
+   - Change `SECRET_KEY` in `.env` to a long, cryptographically secure random string.
+   - Run `make generate-keys` to generate new, secure ED25519 token signing keys for production.
+   - Do not commit `.env` or any secret credentials to your repository.
+2. **Database & Services**:
+   - Update `DATABASE_URL` and `REDIS_URL` to point to your production instances.
+   - Set `DEBUG=false` in `.env`.
+   - Update the default superuser credentials (seeded via `setup_db` as `admin`/`admin123`).
+3. **Billing Integration**:
+   - Replace Stripe keys (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`) with production keys.
+   - Set up your Stripe webhook endpoint and configure `STRIPE_WEBHOOK_SECRET`.
+4. **Email & Storage Services**:
+   - Configure actual production SMTP credentials or set up API keys for email delivery (e.g. Resend/SendGrid).
+   - Configure AWS S3 or Cloudflare R2 credentials for user file uploads.
 
 ## License
 
