@@ -59,5 +59,117 @@
             </div>
         </div>
     </div>
+
+    <!-- Analytics Charts Section -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 mt-8">
+        <!-- API Requests Chart -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">API Requests Analytics</h3>
+                    <p class="text-xs text-gray-500">Live requests processed in the last 7 days</p>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-800">
+                    +12.5% this week
+                </span>
+            </div>
+            <div class="h-64 relative">
+                <canvas id="apiRequestsChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Resource Quota Chart -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900">Plan Resource Quota</h3>
+                    <p class="text-xs text-gray-500">Limits based on your {{ org.plan.value }} tier</p>
+                </div>
+                <span class="text-xs text-gray-500 font-medium">Reset in 12 days</span>
+            </div>
+            <div class="h-64 relative flex items-center justify-center">
+                <div class="w-48 h-48">
+                    <canvas id="resourceQuotaChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. API Requests Line Chart
+        const apiCtx = document.getElementById('apiRequestsChart').getContext('2d');
+        
+        // Create gradients
+        const gradientIndigo = apiCtx.createLinearGradient(0, 0, 0, 240);
+        gradientIndigo.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+        gradientIndigo.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+        new Chart(apiCtx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Successful Requests',
+                    data: [1200, 1900, 3000, 5000, 4200, 2800, 3500],
+                    borderColor: '#4f46e5',
+                    borderWidth: 3,
+                    fill: true,
+                    backgroundColor: gradientIndigo,
+                    tension: 0.4,
+                    pointBackgroundColor: '#4f46e5',
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: {
+                        grid: { borderDash: [5, 5], color: '#f3f4f6' },
+                        ticks: { stepSize: 1000 }
+                    }
+                }
+            }
+        });
+
+        // 2. Resource Quota Doughnut Chart
+        const quotaCtx = document.getElementById('resourceQuotaChart').getContext('2d');
+        new Chart(quotaCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Used Resources', 'Remaining Quota'],
+                datasets: [{
+                    data: [42, 58],
+                    backgroundColor: ['#4f46e5', '#f3f4f6'],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '75%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
