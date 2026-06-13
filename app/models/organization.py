@@ -66,6 +66,23 @@ class Organization(BaseModel):
         unique=True,
     )
 
+    # Generic billing columns for multi-gateway support
+    billing_provider: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+    billing_customer_id: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+        unique=True,
+    )
+    billing_subscription_id: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+        unique=True,
+    )
+
+
     # flexible per-org config: timezone, locale, branding, feature toggles
     settings: Mapped[dict] = mapped_column(
         JSONB,

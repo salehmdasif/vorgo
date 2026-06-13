@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.metadata.title }} - Vorgo Blog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full antialiased text-gray-900">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 w-full flex-none bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/dashboard" class="font-bold text-xl tracking-tight text-indigo-600">Vorgo SaaS</a>
+            <div class="flex items-center space-x-4">
+                <a href="/blog" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">Back to Blog</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <article class="bg-white p-8 sm:p-12 rounded-2xl shadow-sm border border-gray-100 space-y-6">
+            <div class="border-b border-gray-100 pb-6">
+                <span class="text-xs text-indigo-600 font-semibold uppercase tracking-wider">Product Update</span>
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mt-1">{{ post.metadata.title }}</h1>
+                <div class="flex items-center space-x-2 text-xs text-gray-400 mt-4">
+                    <span>By {{ post.metadata.author or "Author" }}</span>
+                    <span>&bull;</span>
+                    <span>Published on {{ post.metadata.date }}</span>
+                </div>
+            </div>
+            
+            <div class="text-gray-700 leading-relaxed space-y-6">
+                {{ post.html | safe }}
+            </div>
+        </article>
+    </div>
+</body>
+</html>

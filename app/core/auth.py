@@ -26,6 +26,13 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     reset_password_token_secret = settings.SECRET_KEY
     verification_token_secret = settings.SECRET_KEY
 
+    def __init__(self, user_db, password_helper=None):
+        if password_helper is None:
+            from fastapi_users.password import PasswordHelper
+            from app.core.security.hashing import pwd_context
+            password_helper = PasswordHelper(pwd_context)
+        super().__init__(user_db, password_helper)
+
     async def authenticate(self, credentials):
         email = credentials.username.lower()
         lockout_key = f"lockout:{email}"

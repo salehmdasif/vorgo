@@ -57,7 +57,7 @@ def run_migrations() -> None:
 
 
 async def create_admin() -> None:
-    email = "admin"
+    email = "admin@vorgo.com"
     password = "admin123"
     print("Creating/checking superuser in database...")
     async with get_db_context() as db:

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payoneer Checkout - Vorgo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full flex items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white shadow-xl rounded-2xl border border-slate-200 overflow-hidden">
+        <!-- Payoneer Header -->
+        <div class="bg-gradient-to-r from-orange-500 to-amber-600 p-6 text-white text-center">
+            <div class="text-2xl font-bold tracking-tight">Payoneer</div>
+            <div class="text-xs text-orange-100 uppercase tracking-widest mt-1">Hosted Checkout Portal</div>
+        </div>
+
+        <!-- Checkout Details -->
+        <div class="p-8 space-y-6">
+            <div class="text-center">
+                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Plan Selected</p>
+                <h2 class="text-2xl font-extrabold text-slate-800 capitalize mt-1">{{ plan }} Plan</h2>
+            </div>
+
+            <div class="bg-slate-50 rounded-lg p-4 space-y-3 text-sm text-slate-600 border border-slate-100">
+                <div class="flex justify-between">
+                    <span>Payee:</span>
+                    <span class="font-semibold text-slate-800">Vorgo SaaS Inc.</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>Account:</span>
+                    <span class="font-semibold text-slate-800">{{ email }}</span>
+                </div>
+                <div class="flex justify-between border-t border-slate-200 pt-3 text-base font-bold text-slate-800">
+                    <span>Total Cost:</span>
+                    <span>
+                        {% if plan == "pro" %}$19.00{% else %}$99.00{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <form action="/dashboard/billing/payoneer/complete" method="POST" class="space-y-4">
+                <input type="hidden" name="org_id" value="{{ org_id }}">
+                <input type="hidden" name="plan" value="{{ plan }}">
+                
+                <button type="submit" class="w-full py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-bold text-sm transition shadow-md hover:shadow-lg">Authorize Payment</button>
+            </form>
+            
+            <p class="text-center text-2xs text-slate-400">
+                Secured by Payoneer Payment Systems. Terms of service apply.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

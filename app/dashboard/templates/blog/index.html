@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Vorgo SaaS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full antialiased text-gray-900">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 w-full flex-none bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/dashboard" class="font-bold text-xl tracking-tight text-indigo-600">Vorgo SaaS</a>
+            <div class="flex items-center space-x-4">
+                <a href="/dashboard" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">Go to Dashboard &rarr;</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+        <div class="text-center space-y-2">
+            <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Our Blog</h1>
+            <p class="text-lg text-gray-500 max-w-lg mx-auto">Latest updates, tutorials, and deep-dives from the Vorgo team.</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-8 pt-8">
+            {% for post in posts %}
+            <article class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 space-y-4">
+                <div>
+                    <span class="text-xs text-indigo-600 font-semibold uppercase tracking-wider">Product Update</span>
+                    <h2 class="text-2xl font-bold text-gray-900 mt-1 hover:text-indigo-600 transition">
+                        <a href="/blog/{{ post.slug }}">{{ post.metadata.title }}</a>
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1">Published on {{ post.metadata.date }}</p>
+                </div>
+                <p class="text-sm text-gray-600 leading-relaxed">{{ post.metadata.description }}</p>
+                <div class="pt-2">
+                    <a href="/blog/{{ post.slug }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-900">Read article &rarr;</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

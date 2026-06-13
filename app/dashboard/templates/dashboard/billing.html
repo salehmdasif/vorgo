@@ -1,0 +1,107 @@
+{% extends "dashboard/layout.html" %}
+
+{% block title %}Billing Settings - Vorgo{% endblock %}
+
+{% block main_content %}
+<div class="max-w-4xl mx-auto space-y-10">
+    <div class="md:flex md:items-center md:justify-between border-b border-gray-200 pb-5">
+        <div class="flex-1 min-w-0">
+            <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Billing & Subscription</h1>
+            <p class="mt-1 text-sm text-gray-500">Manage payment providers, subscriptions, and invoice profiles.</p>
+        </div>
+    </div>
+
+    <!-- Active Subscription Details -->
+    <div class="bg-white shadow rounded-lg border border-gray-100 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
+            <h2 class="text-lg font-semibold text-gray-900">Current Plan Status</h2>
+        </div>
+        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
+            <div>
+                <span class="block font-medium text-gray-500">Current Workspace Plan</span>
+                <span class="block mt-1 text-xl font-bold text-gray-900 capitalize">{{ org.plan.value }} Plan</span>
+            </div>
+            <div>
+                <span class="block font-medium text-gray-500">Subscription Status</span>
+                <span class="block mt-1 text-xl font-bold text-indigo-600 capitalize">{{ org.subscription_status.value }}</span>
+            </div>
+            <div>
+                <span class="block font-medium text-gray-500">Billing Service Provider</span>
+                <span class="block mt-1 text-xl font-bold text-slate-800 capitalize">{{ org.billing_provider or "None (Free)" }}</span>
+            </div>
+            {% if org.trial_ends_at %}
+            <div>
+                <span class="block font-medium text-gray-500">Trial Period Ends</span>
+                <span class="block mt-1 text-xl font-bold text-amber-600">{{ org.trial_ends_at.strftime('%Y-%m-%d') }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Plans Comparison Grid -->
+    <div>
+        <h2 class="text-xl font-bold text-gray-900 text-center mb-6">Change Your Workspace Plan</h2>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <!-- Free Plan -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col justify-between overflow-hidden">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-950">Free</h3>
+                    <p class="mt-4 text-3xl font-extrabold text-gray-900">$0</p>
+                    <p class="mt-1 text-xs text-gray-500">per month</p>
+                    <ul class="mt-6 space-y-4 text-xs text-gray-600">
+                        <li>1 user</li>
+                        <li>Basic AI access</li>
+                        <li>100 Tokens / day</li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-gray-50 border-t border-gray-100">
+                    <button disabled class="w-full py-2 bg-gray-200 text-gray-500 rounded text-xs font-semibold uppercase">Current Plan</button>
+                </div>
+            </div>
+
+            <!-- Pro Plan -->
+            <div class="bg-white rounded-lg shadow-md border-2 border-indigo-500 flex flex-col justify-between overflow-hidden relative">
+                <span class="absolute top-0 right-0 bg-indigo-500 text-white px-3 py-1 text-2xs font-bold uppercase rounded-bl">Popular</span>
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-950">Pro</h3>
+                    <p class="mt-4 text-3xl font-extrabold text-gray-900">$19</p>
+                    <p class="mt-1 text-xs text-gray-500">per month</p>
+                    <ul class="mt-6 space-y-4 text-xs text-gray-600">
+                        <li>Unlimited users</li>
+                        <li>Premium AI access</li>
+                        <li>100,000 Tokens / month</li>
+                        <li>2FA Security</li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-gray-50 border-t border-gray-100">
+                    <form action="/dashboard/billing/subscribe" method="POST">
+                        <input type="hidden" name="plan" value="pro">
+                        <button type="submit" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-semibold uppercase transition">Upgrade to Pro</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Enterprise Plan -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col justify-between overflow-hidden">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-950">Enterprise</h3>
+                    <p class="mt-4 text-3xl font-extrabold text-gray-900">$99</p>
+                    <p class="mt-1 text-xs text-gray-500">per month</p>
+                    <ul class="mt-6 space-y-4 text-xs text-gray-600">
+                        <li>Custom SLAs</li>
+                        <li>Dedicated Resources</li>
+                        <li>Unlimited AI tokens</li>
+                        <li>Advanced Audit Logs</li>
+                    </ul>
+                </div>
+                <div class="p-6 bg-gray-50 border-t border-gray-100">
+                    <form action="/dashboard/billing/subscribe" method="POST">
+                        <input type="hidden" name="plan" value="enterprise">
+                        <button type="submit" class="w-full py-2 bg-slate-900 hover:bg-slate-950 text-white rounded text-xs font-semibold uppercase transition">Contact Sales</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "dashboard/layout.html" %}
+
+{% block title %}Overview - Vorgo{% endblock %}
+
+{% block main_content %}
+<div class="space-y-8">
+    <!-- Welcome Header -->
+    <div class="bg-gradient-to-r from-indigo-800 to-slate-900 rounded-2xl shadow-xl p-8 text-white relative overflow-hidden">
+        <div class="relative z-10 space-y-2">
+            <h1 class="text-3xl font-extrabold tracking-tight">Welcome back!</h1>
+            <p class="text-indigo-200 max-w-xl text-sm leading-relaxed">
+                You are currently managing <strong>{{ org.name }}</strong>. Use the sidebar to update settings, manage your team members, or check your billing plan.
+            </p>
+        </div>
+        <div class="absolute -right-10 -bottom-10 opacity-20 text-indigo-500 font-extrabold text-9xl select-none">
+            {{ org.plan.value.upper() }}
+        </div>
+    </div>
+
+    <!-- Overview Stats Cards -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <!-- Plan Card -->
+        <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-100">
+            <div class="px-4 py-5 sm:p-6">
+                <dl>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Current Subscription Plan</dt>
+                    <dd class="mt-1 text-2xl font-semibold text-indigo-600 capitalize">{{ org.plan.value }}</dd>
+                </dl>
+            </div>
+            <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-between items-center text-xs">
+                <span class="text-gray-500 font-medium capitalize">Status: {{ org.subscription_status.value }}</span>
+                <a href="/dashboard/billing" class="text-indigo-600 hover:text-indigo-900 font-semibold">Manage billing &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Role Card -->
+        <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-100">
+            <div class="px-4 py-5 sm:p-6">
+                <dl>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Your Member Role</dt>
+                    <dd class="mt-1 text-2xl font-semibold text-gray-900 capitalize">{{ user.role.value }}</dd>
+                </dl>
+            </div>
+            <div class="bg-gray-50 px-4 py-4 sm:px-6 text-xs text-gray-500">
+                Authorized for organizational controls.
+            </div>
+        </div>
+
+        <!-- System Status Card -->
+        <div class="bg-white overflow-hidden shadow rounded-lg border border-gray-100">
+            <div class="px-4 py-5 sm:p-6">
+                <dl>
+                    <dt class="text-sm font-medium text-gray-500 truncate">Workspace Status</dt>
+                    <dd class="mt-1 text-2xl font-semibold text-emerald-600">Active</dd>
+                </dl>
+            </div>
+            <div class="bg-gray-50 px-4 py-4 sm:px-6 text-xs text-gray-500">
+                Tenant isolation and routing active.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

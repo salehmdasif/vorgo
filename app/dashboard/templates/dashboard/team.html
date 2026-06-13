@@ -1,0 +1,85 @@
+{% extends "dashboard/layout.html" %}
+
+{% block title %}Team Settings - Vorgo{% endblock %}
+
+{% block main_content %}
+<div class="max-w-4xl mx-auto space-y-10">
+    <div class="md:flex md:items-center md:justify-between border-b border-gray-200 pb-5">
+        <div class="flex-1 min-w-0">
+            <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">Team Members</h1>
+            <p class="mt-1 text-sm text-gray-500">Manage user roles and invitations for your organization.</p>
+        </div>
+    </div>
+
+    {% if success %}
+    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded text-sm shadow-sm">
+        {{ success }}
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm shadow-sm">
+        {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Invite Member -->
+    <div class="bg-white shadow rounded-lg border border-gray-100 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
+            <h2 class="text-lg font-semibold text-gray-900">Invite a Team Member</h2>
+            <p class="text-xs text-gray-500">Sent invites expire in 24 hours.</p>
+        </div>
+        <form action="/dashboard/team/invite" method="POST" class="p-6 flex flex-col sm:flex-row gap-4 items-end">
+            <div class="flex-1 min-w-0">
+                <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                <div class="mt-1">
+                    <input id="email" name="email" type="email" required placeholder="team@example.com" class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+            </div>
+            <button type="submit" class="py-2 px-6 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 whitespace-nowrap">Send Invitation</button>
+        </form>
+    </div>
+
+    <!-- Active Team Members -->
+    <div class="bg-white shadow rounded-lg border border-gray-100 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
+            <h2 class="text-lg font-semibold text-gray-900">Active Members</h2>
+        </div>
+        <ul role="list" class="divide-y divide-gray-100">
+            {% for member in members %}
+            <li class="flex items-center justify-between gap-x-6 py-5 px-6">
+                <div class="min-w-0">
+                    <div class="flex items-start gap-x-3">
+                        <p class="text-sm font-semibold leading-6 text-gray-900">{{ member.email }}</p>
+                    </div>
+                </div>
+                <div class="flex flex-none items-center gap-x-4">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 capitalize">{{ member.role.value }}</span>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Active Invitations -->
+    {% if invitations %}
+    <div class="bg-white shadow rounded-lg border border-gray-100 overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
+            <h2 class="text-lg font-semibold text-gray-900">Pending Invitations</h2>
+        </div>
+        <ul role="list" class="divide-y divide-gray-100">
+            {% for invite in invitations %}
+            <li class="flex items-center justify-between gap-x-6 py-5 px-6">
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold leading-6 text-gray-900">{{ invite.email }}</p>
+                    <p class="mt-1 text-xs text-gray-500">Expires: {{ invite.expires_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+                <div class="flex flex-none items-center gap-x-4">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700">Pending</span>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

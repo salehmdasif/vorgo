@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     EMAIL_FROM: str = ""
 
+    # Billing Provider - stripe | lemonsqueezy | paypal | payoneer
+    BILLING_PROVIDER: str = "stripe"
+
     # Stripe - webhook secret required for webhook verification
     STRIPE_SECRET_KEY: str = ""
     STRIPE_PUBLISHABLE_KEY: str = ""
@@ -39,6 +42,26 @@ class Settings(BaseSettings):
     STRIPE_FREE_PRICE_ID: str = ""
     STRIPE_PRO_PRICE_ID: str = ""
     STRIPE_ENTERPRISE_PRICE_ID: str = ""
+
+    # Lemon Squeezy settings
+    LEMON_SQUEEZY_API_KEY: str = ""
+    LEMON_SQUEEZY_WEBHOOK_SECRET: str = ""
+    LEMON_SQUEEZY_FREE_PRICE_ID: str = ""
+    LEMON_SQUEEZY_PRO_PRICE_ID: str = ""
+    LEMON_SQUEEZY_ENTERPRISE_PRICE_ID: str = ""
+
+    # PayPal settings
+    PAYPAL_CLIENT_ID: str = ""
+    PAYPAL_CLIENT_SECRET: str = ""
+    PAYPAL_MODE: str = "sandbox"  # sandbox | live
+    PAYPAL_FREE_PLAN_ID: str = ""
+    PAYPAL_PRO_PLAN_ID: str = ""
+    PAYPAL_ENTERPRISE_PLAN_ID: str = ""
+
+    # Payoneer settings
+    PAYONEER_CLIENT_ID: str = ""
+    PAYONEER_CLIENT_SECRET: str = ""
+
 
     # S3-compatible storage - works with AWS S3 and Cloudflare R2
     S3_ACCESS_KEY: str = ""

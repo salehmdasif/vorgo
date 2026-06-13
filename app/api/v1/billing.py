@@ -10,7 +10,7 @@ from app.core.auth import current_active_user
 from app.core.database import get_db
 from app.models.organization import Organization, PlanType
 from app.models.user import User
-from app.services import stripe_service
+from app.services.billing import get_billing_service
 
 router = APIRouter(prefix="/billing", tags=["Billing"])
 
@@ -68,7 +68,7 @@ async def create_checkout(
     body: CheckoutRequest,
     user: User = Depends(current_active_user),
 ) -> dict[str, str]:
-    """Generates a Stripe checkout session url to subscribe the user's organization."""
+    """Generates a checkout session url based on the active billing provider."""
     if not user.org_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -76,7 +76,8 @@ async def create_checkout(
         )
 
     try:
-        url = await stripe_service.create_checkout_session(
+        billing_service = get_billing_service()
+        url = await billing_service.create_checkout_session(
             org_id=user.org_id,
             plan=body.plan,
             email=user.email,
@@ -94,7 +95,7 @@ async def create_portal(
     user: User = Depends(current_active_user),
     db: AsyncSession = Depends(get_db),
 ) -> dict[str, str]:
-    """Generates a Stripe billing portal session url to allow card and subscription updates."""
+    """Generates a billing portal url based on the active billing provider."""
     if not user.org_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -105,19 +106,24 @@ async def create_portal(
     result = await db.execute(stmt)
     org = result.scalar_one_or_none()
 
-    if not org or not org.stripe_customer_id:
+    # Fall back to stripe_customer_id if billing_customer_id is not set
+    customer_id = org.billing_customer_id if org else None
+    if org and not customer_id:
+        customer_id = org.stripe_customer_id
+
+    if not org or not customer_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No active billing history found for this organization",
         )
 
     try:
-        url = await stripe_service.create_billing_portal_session(
-            stripe_customer_id=org.stripe_customer_id
-        )
+        billing_service = get_billing_service()
+        url = await billing_service.create_portal_session(customer_id=customer_id)
         return {"url": url}
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e),
         )
+
