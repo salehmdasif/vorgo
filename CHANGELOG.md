@@ -6,6 +6,28 @@ Format: [Semantic Versioning](https://semver.org/)
 
 ---
 
+## [0.4.0] - 2026-06-14
+
+### Added
+- **Multi-Gateway Billing Layer**
+  - Unified `BillingService` factory pattern.
+  - Implementations for **Stripe**, **Lemon Squeezy** (webhook verification), **PayPal** (subscriptions API), and **Payoneer** (simulated hosted checkout).
+  - Schema migration for unified organization billing fields.
+- **Dashboard UI (Tailwind + HTMX + Jinja2)**
+  - Responsive layout shell with sidebar navigation.
+  - Page views: Overview, Profile Settings, Team Settings, Billing Plans.
+  - **Chart.js integration**: API request analytics line chart and resource quota doughnut chart on Overview dashboard.
+- **Markdown Blog & Documentation System**
+  - Custom `MarkdownService` for parsing YAML frontmatter and Markdown content into styled HTML.
+  - Subdomain / Path-based routers for `/docs` and `/blog`.
+  - Welcome blog and getting-started documentation pages.
+
+### Fixed
+- **Authentication & Hashing Mismatch**
+  - Integrated `passlib` context in `fastapi-users` with the application's unified `pwd_context` supporting both `bcrypt` and `argon2` schemes.
+  - Resolved nesting class `NameError: name 'password' is not defined` scope bugs in login POST endpoint using `SimpleNamespace`.
+  - Added root path `/` redirection handling (routes logged-in users to `/dashboard` and guest users to `/login`).
+
 ## [0.3.0] - 2026-06-12
 
 ### Added

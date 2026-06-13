@@ -90,15 +90,17 @@ arq              → Async background jobs
 fastapi-users    → Auth system
 PyJWT + crypto   → ED25519 JWT
 SQLAdmin         → Admin panel
-Stripe           → Billing
-HTMX + Jinja2   → Server-side UI (React-free)
+Stripe, Lemon Squeezy, PayPal, Payoneer → Unified multi-gateway billing
+HTMX + Jinja2 + Tailwind + Chart.js     → Interactive server-side dashboard UI (React-free)
 ```
 
 ## Features
 
 - **Auth:** Email/password, OAuth2, 2FA (TOTP), ED25519 JWT, refresh token rotation
 - **Multi-tenancy:** Shared schema with TenantService isolation, subdomain routing
-- **Billing:** Stripe checkout, webhooks, subscription management, trial logic
+- **Billing:** Multi-gateway (Stripe, Lemon Squeezy, PayPal, Payoneer) checkout, webhooks, subscription management, trial logic
+- **Dashboard UI:** Jinja2 + HTMX + Tailwind responsive views with Chart.js analytics visualizations
+- **Blog & Docs:** Markdown-powered documentation and blog system with YAML frontmatter parsing
 - **Admin:** SQLAdmin panel — users, orgs, subscriptions, audit logs
 - **AI:** LLM wrapper, token tracking, plan gating, RAG/pgvector
 - **Background jobs:** arq (async-native, no Celery friction)
