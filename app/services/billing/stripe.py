@@ -1,7 +1,8 @@
-import stripe
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
+
+import stripe
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,6 +11,7 @@ from app.models.organization import Organization, PlanType, SubscriptionStatus
 from app.services.billing.base import BaseBillingService
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
 
 class StripeBillingService(BaseBillingService):
     """Stripe Implementation of the Unified Billing Service."""

@@ -1,10 +1,11 @@
 import asyncio
 import os
-from alembic import command
-from alembic.config import Config
+
 import asyncpg
 from sqlalchemy import select
 
+from alembic import command
+from alembic.config import Config
 from app.core.config import settings
 from app.core.database import get_db_context
 from app.core.security.hashing import hash_password
@@ -25,7 +26,9 @@ async def create_db() -> None:
     port = parsed.port or 5432
     db_name = parsed.path.lstrip("/")
 
-    print(f"Connecting to system database 'postgres' to check for database '{db_name}'...")
+    print(
+        f"Connecting to system database 'postgres' to check for database '{db_name}'..."
+    )
     conn = await asyncpg.connect(
         user=user,
         password=password,
@@ -33,7 +36,9 @@ async def create_db() -> None:
         port=port,
         database="postgres",
     )
-    exists = await conn.fetchval("SELECT 1 FROM pg_database WHERE datname = $1", db_name)
+    exists = await conn.fetchval(
+        "SELECT 1 FROM pg_database WHERE datname = $1", db_name
+    )
     if not exists:
         print(f"Database '{db_name}' does not exist. Creating it now...")
         await conn.execute(f"CREATE DATABASE {db_name}")

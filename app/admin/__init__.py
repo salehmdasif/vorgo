@@ -4,7 +4,13 @@ from sqladmin import Admin
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.admin.auth import AdminAuth
-from app.admin.views import AuditLogAdmin, OrganizationAdmin, UserAdmin, FeatureFlagAdmin, InvitationAdmin
+from app.admin.views import (
+    AuditLogAdmin,
+    FeatureFlagAdmin,
+    InvitationAdmin,
+    OrganizationAdmin,
+    UserAdmin,
+)
 from app.core.config import settings
 from app.core.database import engine
 

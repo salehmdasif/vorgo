@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta, timezone
 import logging
+from datetime import datetime, timedelta, timezone
+
 from sqlalchemy import select
 
 from app.core.database import get_db_context
@@ -59,6 +60,10 @@ async def trial_expiry_check(ctx: dict) -> None:
                         "user_name": admin.email,
                         "org_name": org.name,
                         "days_remaining": days_remaining,
-                        "expiry_date": org.trial_ends_at.strftime("%Y-%m-%d") if org.trial_ends_at else "",
+                        "expiry_date": (
+                            org.trial_ends_at.strftime("%Y-%m-%d")
+                            if org.trial_ends_at
+                            else ""
+                        ),
                     },
                 )

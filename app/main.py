@@ -4,15 +4,13 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
 
 from app.admin import setup_admin
 from app.api.v1 import api_router
-from app.dashboard.routes import router as dashboard_router
 from app.core.config import settings
 from app.core.database import check_db_connection, engine
 from app.core.exceptions import AppError, ErrorResponse
-from slowapi.errors import RateLimitExceeded
-
 from app.core.middleware import (
     RequestIDMiddleware,
     SecurityHeadersMiddleware,
@@ -20,6 +18,7 @@ from app.core.middleware import (
 )
 from app.core.rate_limit import limiter
 from app.core.redis import check_redis_connection, close_redis_pool
+from app.dashboard.routes import router as dashboard_router
 
 
 @asynccontextmanager
@@ -127,13 +126,13 @@ async def validation_error_handler(
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     request_id = getattr(request.state, "request_id", "unknown")
-    
+
     # Handle redirects for browser-facing page requests
     if 300 <= exc.status_code < 400 and exc.headers and "Location" in exc.headers:
         from fastapi.responses import RedirectResponse
+
         return RedirectResponse(
-            url=exc.headers["Location"],
-            status_code=exc.status_code
+            url=exc.headers["Location"], status_code=exc.status_code
         )
 
     error_map = {
@@ -156,7 +155,6 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     )
 
 
-
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     request_id = getattr(request.state, "request_id", "unknown")
@@ -173,4 +171,3 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(dashboard_router)
-

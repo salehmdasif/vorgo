@@ -37,13 +37,23 @@ class Organization(BaseModel):
     )
 
     plan: Mapped[PlanType] = mapped_column(
-        SAEnum(PlanType, name="plan_type", create_type=True, values_callable=lambda obj: [e.value for e in obj]),
+        SAEnum(
+            PlanType,
+            name="plan_type",
+            create_type=True,
+            values_callable=lambda obj: [e.value for e in obj],
+        ),
         default=PlanType.FREE,
         nullable=False,
     )
 
     subscription_status: Mapped[SubscriptionStatus] = mapped_column(
-        SAEnum(SubscriptionStatus, name="subscription_status", create_type=True, values_callable=lambda obj: [e.value for e in obj]),
+        SAEnum(
+            SubscriptionStatus,
+            name="subscription_status",
+            create_type=True,
+            values_callable=lambda obj: [e.value for e in obj],
+        ),
         default=SubscriptionStatus.TRIALING,
         nullable=False,
     )
@@ -81,7 +91,6 @@ class Organization(BaseModel):
         nullable=True,
         unique=True,
     )
-
 
     # flexible per-org config: timezone, locale, branding, feature toggles
     settings: Mapped[dict] = mapped_column(

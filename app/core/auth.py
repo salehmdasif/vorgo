@@ -29,7 +29,9 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     def __init__(self, user_db, password_helper=None):
         if password_helper is None:
             from fastapi_users.password import PasswordHelper
+
             from app.core.security.hashing import pwd_context
+
             password_helper = PasswordHelper(pwd_context)
         super().__init__(user_db, password_helper)
 
@@ -55,7 +57,9 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
         from datetime import datetime, timedelta, timezone
+
         from sqlalchemy import select
+
         from app.core.database import get_db_context
         from app.models.organization import Organization, PlanType, SubscriptionStatus
         from app.models.user import UserRole
@@ -96,6 +100,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         self, user: User, token: str, request: Optional[Request] = None
     ):
         from app.services.email_service import email_service
+
         reset_link = f"{settings.FRONTEND_URL}/reset-password?token={token}"
         await email_service.send_email(
             to_email=user.email,
@@ -108,6 +113,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         self, user: User, token: str, request: Optional[Request] = None
     ):
         from app.services.email_service import email_service
+
         verify_link = f"{settings.FRONTEND_URL}/verify-email?token={token}"
         await email_service.send_email(
             to_email=user.email,

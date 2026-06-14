@@ -1,10 +1,8 @@
 import logging
-from uuid import UUID
 
 from fastapi import Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
-from sqlalchemy import select
 
 from app.core.config import settings
 
@@ -36,7 +34,9 @@ def dynamic_rate_limit(request: Request = None) -> str:
 
     if request is None:
         import inspect
+
         from starlette.requests import Request as StarletteRequest
+
         for frame_info in inspect.stack():
             if "request" in frame_info.frame.f_locals:
                 obj = frame_info.frame.f_locals["request"]
@@ -45,7 +45,9 @@ def dynamic_rate_limit(request: Request = None) -> str:
                     break
             if "self" in frame_info.frame.f_locals:
                 self_obj = frame_info.frame.f_locals["self"]
-                if hasattr(self_obj, "request") and isinstance(getattr(self_obj, "request"), StarletteRequest):
+                if hasattr(self_obj, "request") and isinstance(
+                    getattr(self_obj, "request"), StarletteRequest
+                ):
                     request = self_obj.request
                     break
 

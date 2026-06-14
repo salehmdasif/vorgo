@@ -6,13 +6,18 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.auth import current_active_user, fastapi_users, get_user_manager, UserManager
+from app.core.auth import (
+    UserManager,
+    current_active_user,
+    fastapi_users,
+    get_user_manager,
+)
 from app.core.database import get_db
 from app.core.exceptions import Errors
 from app.core.security.jwt import (
     create_access_token,
-    create_refresh_token,
     create_pre_2fa_token,
+    create_refresh_token,
     verify_token,
 )
 from app.core.security.tokens import (

@@ -1,6 +1,9 @@
 from uuid import UUID
+
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models.organization import PlanType
+
 
 class BaseBillingService:
     """Interface for SaaS Billing integration (Stripe, Lemon Squeezy, PayPal, Payoneer)."""

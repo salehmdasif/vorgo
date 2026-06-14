@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Any
 
 from fastapi import Depends
 from sqlalchemy import select
@@ -9,7 +8,6 @@ from app.core.auth import current_active_user
 from app.core.database import get_db
 from app.core.exceptions import Errors
 from app.models.user import User, UserRole
-
 
 
 def require_role(*roles: UserRole) -> Callable:
@@ -95,4 +93,3 @@ def require_feature(name: str) -> Callable:
             raise Errors.PLAN_LIMIT_EXCEEDED()
 
     return dependency
-

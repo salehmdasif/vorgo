@@ -40,7 +40,12 @@ class User(SQLAlchemyBaseUserTableUUID, TimestampMixin, Base):
     )
 
     role: Mapped[UserRole] = mapped_column(
-        SAEnum(UserRole, name="user_role", create_type=True, values_callable=lambda obj: [e.value for e in obj]),
+        SAEnum(
+            UserRole,
+            name="user_role",
+            create_type=True,
+            values_callable=lambda obj: [e.value for e in obj],
+        ),
         default=UserRole.USER,
         nullable=False,
     )

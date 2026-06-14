@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta, timezone
 import secrets
+from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from sqlalchemy import select
@@ -23,7 +23,7 @@ async def create_invitation(
     Generates a unique secure token and sets expiry to 7 days.
     """
     email_lower = email.lower().strip()
-    
+
     # 1. Check if user already in this organization
     stmt = select(User).where(User.email == email_lower)
     res = await db.execute(stmt)
@@ -69,12 +69,13 @@ async def create_invitation(
     # 4. Send email invitation
     from app.core.config import settings
     from app.models.organization import Organization
-    
+
     stmt_org = select(Organization.name).where(Organization.id == org_id)
     res_org = await db.execute(stmt_org)
     org_name = res_org.scalar_one()
 
     from app.services.email_service import email_service
+
     accept_link = f"{settings.FRONTEND_URL}/accept-invitation?token={token}"
     await email_service.send_email(
         to_email=email_lower,
@@ -167,7 +168,9 @@ async def accept_invitation(
     return user
 
 
-async def revoke_invitation(db: AsyncSession, invitation_id: UUID, org_id: UUID) -> None:
+async def revoke_invitation(
+    db: AsyncSession, invitation_id: UUID, org_id: UUID
+) -> None:
     """
     Revokes (deletes) a pending invitation for a given organization context.
     """

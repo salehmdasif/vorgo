@@ -45,8 +45,8 @@ class TenantMiddleware(BaseHTTPMiddleware):
     """
 
     async def dispatch(self, request: Request, call_next) -> Response:
-        from app.models.user import User
         from app.core.security.jwt import verify_token
+        from app.models.user import User
 
         host = request.headers.get("host", "")
         host_name = host.split(":")[0]
@@ -74,12 +74,16 @@ class TenantMiddleware(BaseHTTPMiddleware):
 
             if cached_org_id:
                 request.state.org_slug = subdomain_lower
-                request.state.org_id = UUID(cached_org_id.decode() if isinstance(cached_org_id, bytes) else cached_org_id)
+                request.state.org_id = UUID(
+                    cached_org_id.decode()
+                    if isinstance(cached_org_id, bytes)
+                    else cached_org_id
+                )
             else:
                 async with get_db_context() as db:
                     stmt = select(Organization).where(
                         Organization.slug == subdomain_lower,
-                        Organization.is_active == True,
+                        Organization.is_active,
                     )
                     res = await db.execute(stmt)
                     org = res.scalar_one_or_none()
@@ -107,14 +111,20 @@ class TenantMiddleware(BaseHTTPMiddleware):
                     cache_key = f"user_plan:{user_id}"
                     cached_plan = await redis.get(cache_key)
                     if cached_plan:
-                        request.state.plan = cached_plan.decode() if isinstance(cached_plan, bytes) else cached_plan
+                        request.state.plan = (
+                            cached_plan.decode()
+                            if isinstance(cached_plan, bytes)
+                            else cached_plan
+                        )
                     else:
                         async with get_db_context() as db:
                             stmt = select(User.org_id).where(User.id == UUID(user_id))
                             res = await db.execute(stmt)
                             org_id = res.scalar_one_or_none()
                             if org_id:
-                                stmt_org = select(Organization.plan).where(Organization.id == org_id)
+                                stmt_org = select(Organization.plan).where(
+                                    Organization.id == org_id
+                                )
                                 res_org = await db.execute(stmt_org)
                                 plan_enum = res_org.scalar_one_or_none()
                                 if plan_enum:

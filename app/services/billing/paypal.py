@@ -1,13 +1,14 @@
-import httpx
-from datetime import datetime, UTC
 from typing import Any
 from uuid import UUID
+
+import httpx
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.models.organization import Organization, PlanType, SubscriptionStatus
 from app.services.billing.base import BaseBillingService
+
 
 class PayPalBillingService(BaseBillingService):
     """PayPal Implementation of the Unified Billing Service."""
@@ -30,13 +31,10 @@ class PayPalBillingService(BaseBillingService):
 
     async def _get_access_token(self) -> str:
         url = f"{self._get_api_url()}/v1/oauth2/token"
-        headers = {
-            "Accept": "application/json",
-            "Accept-Language": "en_US"
-        }
+        headers = {"Accept": "application/json", "Accept-Language": "en_US"}
         data = {"grant_type": "client_credentials"}
         auth = (settings.PAYPAL_CLIENT_ID, settings.PAYPAL_CLIENT_SECRET)
-        
+
         async with httpx.AsyncClient() as client:
             res = await client.post(url, headers=headers, data=data, auth=auth)
             res.raise_for_status()
@@ -47,21 +45,19 @@ class PayPalBillingService(BaseBillingService):
     ) -> str:
         plan_id = self._get_plan_id_for_plan(plan)
         token = await self._get_access_token()
-        
+
         url = f"{self._get_api_url()}/v1/billing/subscriptions"
         headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {token}",
             "Accept": "application/json",
-            "Prefer": "return=representation"
+            "Prefer": "return=representation",
         }
-        
+
         # PayPal subscription payload
         payload = {
             "plan_id": plan_id,
-            "subscriber": {
-                "email_address": email
-            },
+            "subscriber": {"email_address": email},
             "application_context": {
                 "brand_name": settings.APP_NAME,
                 "locale": "en-US",
@@ -69,24 +65,24 @@ class PayPalBillingService(BaseBillingService):
                 "user_action": "SUBSCRIBE_NOW",
                 "payment_method": {
                     "payer_selected": "PAYPAL",
-                    "payee_preferred": "IMMEDIATE_PAYMENT_REQUIRED"
+                    "payee_preferred": "IMMEDIATE_PAYMENT_REQUIRED",
                 },
                 "return_url": f"{settings.FRONTEND_URL}/dashboard/billing?status=success",
-                "cancel_url": f"{settings.FRONTEND_URL}/dashboard/billing?status=cancel"
+                "cancel_url": f"{settings.FRONTEND_URL}/dashboard/billing?status=cancel",
             },
-            "custom_id": f"{org_id}:{plan.value}"  # custom_id stores metadata
+            "custom_id": f"{org_id}:{plan.value}",  # custom_id stores metadata
         }
-        
+
         async with httpx.AsyncClient() as client:
             res = await client.post(url, headers=headers, json=payload)
             res.raise_for_status()
             data = res.json()
-            
+
             # Extract approval link
             for link in data.get("links", []):
                 if link.get("rel") == "approve":
                     return link.get("href")
-            
+
             raise ValueError("PayPal approval link not found in response")
 
     async def create_portal_session(self, customer_id: str) -> str:
@@ -100,6 +96,7 @@ class PayPalBillingService(BaseBillingService):
         # Since local sandbox verification is complex without direct API hits, we'll parse the event
         # and process subscription events.
         import json
+
         event = json.loads(payload.decode())
         event_type = event.get("event_type")
         resource = event.get("resource", {})

@@ -1,12 +1,12 @@
-import httpx
-from datetime import datetime, UTC
 from uuid import UUID
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.models.organization import Organization, PlanType, SubscriptionStatus
 from app.services.billing.base import BaseBillingService
+
 
 class PayoneerBillingService(BaseBillingService):
     """
@@ -34,6 +34,7 @@ class PayoneerBillingService(BaseBillingService):
     ) -> None:
         # Verify Payoneer signature / IPN
         import json
+
         event = json.loads(payload.decode())
         event_type = event.get("event_type")
         data = event.get("data", {})
@@ -56,6 +57,6 @@ class PayoneerBillingService(BaseBillingService):
                     org.subscription_status = SubscriptionStatus.ACTIVE
                     if plan_str:
                         org.plan = PlanType(plan_str)
-                    
+
                     db.add(org)
                     await db.flush()

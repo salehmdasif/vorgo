@@ -1,12 +1,13 @@
 import time
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 from app.core.config import settings
 from app.core.database import check_db_connection
+from app.core.rate_limit import dynamic_rate_limit, limiter
 from app.core.redis import check_redis_connection
 
 router = APIRouter(tags=["System"])
@@ -92,9 +93,6 @@ async def metrics():
     )
 
 
-from fastapi import Request
-
-
 @router.get("/test-tenant")
 async def test_tenant(request: Request):
     return {
@@ -103,12 +101,7 @@ async def test_tenant(request: Request):
     }
 
 
-from app.core.rate_limit import limiter, dynamic_rate_limit
-
-
 @router.get("/test-rate-limit")
 @limiter.limit(dynamic_rate_limit)
 async def test_rate_limiting(request: Request):
     return {"status": "ok"}
-
-

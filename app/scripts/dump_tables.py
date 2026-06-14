@@ -19,7 +19,7 @@ cols = [c[1] for c in cursor.fetchall()]
 cursor.execute("SELECT * FROM keys;")
 for r in cursor.fetchall():
     # hide the sensitive values but show schema
-    print({k: (v if k != 'value' else '<hidden>') for k, v in zip(cols, r)})
+    print({k: (v if k != "value" else "<hidden>") for k, v in zip(cols, r)})
 
 # Get everything from 'server'
 print("\n--- SERVER TABLE ---")
@@ -27,6 +27,6 @@ cursor.execute("PRAGMA table_info(server);")
 cols = [c[1] for c in cursor.fetchall()]
 cursor.execute("SELECT * FROM server;")
 for r in cursor.fetchall():
-    print({k: (v if k != 'password' else '<encrypted>') for k, v in zip(cols, r)})
+    print({k: (v if k != "password" else "<encrypted>") for k, v in zip(cols, r)})
 
 conn.close()

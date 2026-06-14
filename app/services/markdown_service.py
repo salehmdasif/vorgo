@@ -1,7 +1,9 @@
 import os
-import yaml
-import markdown
 from typing import Any
+
+import markdown
+import yaml
+
 
 class MarkdownService:
     """Service to parse markdown files with YAML frontmatter for Docs and Blogs."""
@@ -12,7 +14,7 @@ class MarkdownService:
     def get_content(self, section: str, slug: str) -> dict[str, Any] | None:
         """Reads a markdown file, parses metadata, and converts markdown body to HTML."""
         file_path = os.path.join(self.base_dir, section, f"{slug}.md")
-        
+
         if not os.path.exists(file_path):
             return None
 
@@ -34,11 +36,7 @@ class MarkdownService:
             # Convert markdown body to HTML
             html_body = markdown.markdown(body, extensions=["fenced_code", "tables"])
 
-            return {
-                "metadata": metadata,
-                "html": html_body,
-                "slug": slug
-            }
+            return {"metadata": metadata, "html": html_body, "slug": slug}
         except Exception:
             return None
 
@@ -54,11 +52,14 @@ class MarkdownService:
                 slug = filename[:-3]
                 post = self.get_content(section, slug)
                 if post:
-                    posts.append({
-                        "slug": slug,
-                        "metadata": post.get("metadata", {}),
-                        "title": post.get("metadata", {}).get("title", slug)
-                    })
+                    posts.append(
+                        {
+                            "slug": slug,
+                            "metadata": post.get("metadata", {}),
+                            "title": post.get("metadata", {}).get("title", slug),
+                        }
+                    )
         return posts
+
 
 markdown_service = MarkdownService()

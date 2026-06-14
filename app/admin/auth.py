@@ -1,7 +1,7 @@
 # ── Imports ───────────────────────────────────────────────────────────────────
 from fastapi_users.db import SQLAlchemyUserDatabase
-from sqlalchemy import select
 from sqladmin.authentication import AuthenticationBackend
+from sqlalchemy import select
 from starlette.requests import Request
 
 from app.core.auth import UserManager

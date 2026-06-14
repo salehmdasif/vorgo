@@ -62,7 +62,6 @@ class Settings(BaseSettings):
     PAYONEER_CLIENT_ID: str = ""
     PAYONEER_CLIENT_SECRET: str = ""
 
-
     # S3-compatible storage - works with AWS S3 and Cloudflare R2
     S3_ACCESS_KEY: str = ""
     S3_SECRET_KEY: str = ""

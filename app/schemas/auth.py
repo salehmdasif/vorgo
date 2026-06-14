@@ -32,5 +32,3 @@ class TwoFactorChallengeRequest(BaseModel):
 class LoginResponse2FA(BaseModel):
     requires_2fa: bool = True
     pre_2fa_token: str
-
-

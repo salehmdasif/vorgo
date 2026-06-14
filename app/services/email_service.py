@@ -40,7 +40,7 @@ class EmailService:
         """
         # Standardize app_name in template context
         context.setdefault("app_name", settings.APP_NAME)
-        
+
         try:
             pool = await self.get_arq_pool()
             await pool.enqueue_job(
@@ -87,7 +87,9 @@ class EmailService:
         elif provider in ("sendgrid", "resend"):
             logger.info(f"[MOCK EMAIL API] Sending email via {provider} to {to_email}")
         else:
-            logger.warning(f"Unknown email provider: {provider}. Logging email instead.")
+            logger.warning(
+                f"Unknown email provider: {provider}. Logging email instead."
+            )
             logger.info(
                 f"[EMAIL LOG] To: {to_email} | Subject: {subject} | Body: {html_content[:200]}"
             )

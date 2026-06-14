@@ -2,15 +2,16 @@ from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.exceptions import Errors
 from app.core.rbac import require_role
+from app.models.invitation import Invitation
 from app.models.organization import Organization
 from app.models.user import User, UserRole
-from app.models.invitation import Invitation
 from app.schemas.invitation import (
     InvitationAccept,
     InvitationCreate,
@@ -23,7 +24,6 @@ from app.services.invitation_service import (
     get_invitation_by_token,
     revoke_invitation,
 )
-from pydantic import BaseModel
 
 router = APIRouter(prefix="/invitations", tags=["invitations"])
 

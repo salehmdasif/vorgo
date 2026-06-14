@@ -24,9 +24,7 @@ async def shutdown(ctx: dict) -> None:
 
 class WorkerSettings:
     functions = [send_email_task]
-    cron_jobs = [
-        cron(trial_expiry_check, hour=0, minute=0)  # Run daily at midnight
-    ]
+    cron_jobs = [cron(trial_expiry_check, hour=0, minute=0)]  # Run daily at midnight
 
     redis_settings = RedisSettings.from_dsn(settings.REDIS_URL)
     on_startup = startup

@@ -1,13 +1,14 @@
 # ── Imports ───────────────────────────────────────────────────────────────────
+from typing import Any
+
 from sqladmin import ModelView
 from starlette.requests import Request
-from typing import Any
 
 from app.models.audit_log import AuditLog
 from app.models.feature_flag import FeatureFlag
+from app.models.invitation import Invitation
 from app.models.organization import Organization
 from app.models.user import User
-from app.models.invitation import Invitation
 
 # ── Model Views ───────────────────────────────────────────────────────────────
 
