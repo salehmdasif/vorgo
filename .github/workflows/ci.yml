@@ -20,7 +20,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U vorgo_user -d vorgo_test_db"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 5
@@ -36,8 +36,8 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql+asyncpg://vorgo_user:vorgo_pass@localhost:5432/vorgo_test_db
-      REDIS_URL: redis://localhost:6379/0
+      DATABASE_URL: postgresql+asyncpg://vorgo_user:vorgo_pass@127.0.0.1:5432/vorgo_test_db
+      REDIS_URL: redis://127.0.0.1:6379/0
       SECRET_KEY: test-secret-key
       ENVIRONMENT: test
       DEBUG: false
@@ -61,4 +61,4 @@ jobs:
           black --check app/
 
       - name: Run tests
-        run: pytest tests/ -v --tb=short
+        run: python -m pytest tests/ -v --tb=short
