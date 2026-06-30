@@ -41,8 +41,8 @@ jobs:
       SECRET_KEY: test-secret-key
       ENVIRONMENT: test
       DEBUG: false
-      ED25519_PRIVATE_KEY: ""
-      ED25519_PUBLIC_KEY: ""
+      ED25519_PRIVATE_KEY: "mpBEGqCksF2DjFmEoDNGv9/PLSy43uKC6LE58vjED48="
+      ED25519_PUBLIC_KEY: "Fe8/iH5hKJ/Thb2S0z719IRRtQqoGpSC9LFhiKc3fXQ="
 
     steps:
       - uses: actions/checkout@v4
